@@ -1,0 +1,49 @@
+{
+  "name": "Sistema de Chamados de Manutenção",
+  "description": "Sistema completo para gerenciamento de chamados de manutenção",
+  "keywords": ["flask", "python", "maintenance", "tickets"],
+  "website": "https://sistema-chamados.com",
+  "repository": "https://github.com/usuario/chamados-manutencao",
+  "logo": "https://sistema-chamados.com/logo.png",
+  "success_url": "/",
+  "scripts": {
+    "postdeploy": "python -c \"from src.models.user import db; db.create_all()\""
+  },
+  "env": {
+    "SECRET_KEY": {
+      "description": "Chave secreta para sessões Flask",
+      "generator": "secret"
+    },
+    "FLASK_ENV": {
+      "description": "Ambiente Flask",
+      "value": "production"
+    },
+    "ADMIN_PASSWORD": {
+      "description": "Senha do administrador",
+      "value": "admin123"
+    },
+    "SUPERVISOR_PASSWORD": {
+      "description": "Senha do supervisor",
+      "value": "1234"
+    },
+    "NOTIFICACOES_ATIVAS": {
+      "description": "Ativar notificações por e-mail",
+      "value": "False"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": [
+    "heroku-postgresql:mini"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ]
+}
+
