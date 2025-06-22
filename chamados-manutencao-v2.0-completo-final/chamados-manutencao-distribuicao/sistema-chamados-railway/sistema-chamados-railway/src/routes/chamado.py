@@ -1,8 +1,6 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
+chamado_bp = Blueprint("chamado", __name__, url_prefix="/chamados")
 
-chamado_bp = Blueprint('chamado', __name__)
-
-@chamado_bp.route('/chamados/teste', methods=['GET'])
-def teste():
-    return {'mensagem': 'Rota de chamado funcionando'}
-
+@chamado_bp.route("/", endpoint="index")   # <--  nome da rota = chamado.index
+def index():
+    return render_template("painel_chamados.html")
