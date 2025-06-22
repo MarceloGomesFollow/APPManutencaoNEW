@@ -16,7 +16,7 @@
                     Acompanhe o status das suas solicitações em tempo real.
                 </p>
                 <div class="d-flex flex-wrap gap-3">
-                    <a href="{{ url_for('chamado.abrir_chamado') }}" class="btn btn-primary btn-lg">
+                    <a href="{{ url_for('chamado.index') }}" class="btn btn-primary btn-lg">
                         <i class="bi bi-plus-circle"></i> Abrir Chamado
                     </a>
                     <a href="{{ url_for('chamado.relatorio') }}" class="btn btn-outline-light btn-lg">
@@ -153,7 +153,7 @@
                 
                 <div class="row g-3 justify-content-center">
                     <div class="col-md-4">
-                        <a href="{{ url_for('chamado.abrir_chamado') }}" class="btn btn-primary btn-lg w-100 py-3">
+                        <a href="{{ url_for('chamado.index') }}" class="btn btn-primary btn-lg w-100 py-3">
                             <i class="bi bi-plus-circle fs-4 d-block mb-2"></i>
                             Novo Chamado
                         </a>
