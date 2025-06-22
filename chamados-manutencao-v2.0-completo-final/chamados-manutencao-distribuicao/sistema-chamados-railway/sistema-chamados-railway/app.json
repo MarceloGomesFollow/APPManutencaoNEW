@@ -7,7 +7,7 @@
   "logo": "https://sistema-chamados.com/logo.png",
   "success_url": "/",
   "scripts": {
-    "postdeploy": "python -c \"from src.models.user import db; db.create_all()\""
+    "postdeploy": "python create_db.py"
   },
   "env": {
     "SECRET_KEY": {

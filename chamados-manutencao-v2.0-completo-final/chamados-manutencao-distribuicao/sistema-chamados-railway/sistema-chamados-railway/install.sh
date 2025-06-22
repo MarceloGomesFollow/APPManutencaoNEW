@@ -161,11 +161,7 @@ init_database() {
     sleep 10
     
     print_message "Criando tabelas do banco de dados..."
-    docker-compose exec app python -c "
-from src.models.user import db
-db.create_all()
-print('Banco de dados inicializado com sucesso!')
-"
+    docker-compose exec app python create_db.py
     
     print_message "Banco de dados configurado com sucesso!"
 }
