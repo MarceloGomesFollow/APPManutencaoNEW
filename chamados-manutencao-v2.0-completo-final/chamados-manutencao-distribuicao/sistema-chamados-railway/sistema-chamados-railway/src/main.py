@@ -1,138 +1,136 @@
 import os
 import sys
-from dotenv import load_dotenv
-
-# Carregar variáveis de ambiente
-load_dotenv()
-
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from flask_cors import CORS
-from src.config import Config
+from flask import Flask, send_from_directory
 from src.models.user import db
+from src.routes.user import user_bp
+from src.routes.chamado import chamado_bp
+from src.config import Config
 
-# Importar apenas modelos que existem
-try:
-    from src.models.chamado import Chamado
-except ImportError:
-    Chamado = None
+app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-try:
-    from src.models.turno import Turno
-except ImportError:
-    Turno = None
+# Carrega configurações
+app.config.from_object(Config)
+Config.init_app(app)
 
-try:
-    from src.models.unidade import Unidade
-except ImportError:
-    Unidade = None
+# Registra blueprints
+app.register_blueprint(user_bp, url_prefix='/api')
+app.register_blueprint(chamado_bp)
 
-try:
-    from src.models.local_apontamento import LocalApontamento
-except ImportError:
-    LocalApontamento = None
+# Registra blueprint de administração
+from src.routes.admin import admin_bp
+app.register_blueprint(admin_bp)
 
-try:
-    from src.models.nao_conformidade import NaoConformidade
-except ImportError:
-    NaoConformidade = None
+# Inicializa banco de dados
+db.init_app(app)
 
-try:
-    from src.models.status_chamado import StatusChamado
-except ImportError:
-    StatusChamado = None
-
-try:
+def inserir_dados_iniciais():
+    """Insere dados iniciais necessários para o funcionamento do sistema"""
     from src.models.perfil import Perfil
-except ImportError:
-    Perfil = None
+    from src.models.status_chamado import StatusChamado
+    from src.models.turno import Turno
+    from src.models.unidade import Unidade
+    from src.models.nao_conformidade import NaoConformidade
+    from src.models.local_apontamento import LocalApontamento
+    
+    # Inserir perfis padrão
+    if not Perfil.query.first():
+        perfis = [
+            Perfil(nome='Administrador', descricao='Acesso total ao sistema'),
+            Perfil(nome='Manutenção', descricao='Técnicos de manutenção'),
+            Perfil(nome='Requisitante', descricao='Usuários que abrem chamados')
+        ]
+        for perfil in perfis:
+            db.session.add(perfil)
+    
+    # Inserir status padrão
+    if not StatusChamado.query.first():
+        status_list = [
+            StatusChamado(nome='Inicial', ordem=1),
+            StatusChamado(nome='Em aberto', ordem=2),
+            StatusChamado(nome='Em Andamento', ordem=3),
+            StatusChamado(nome='Aguardando Material de Reparo', ordem=4),
+            StatusChamado(nome='Concluído', ordem=5)
+        ]
+        for status in status_list:
+            db.session.add(status)
+    
+    # Inserir dados de exemplo para turnos
+    if not Turno.query.first():
+        turnos = [
+            Turno(nome='Manhã'),
+            Turno(nome='Tarde'),
+            Turno(nome='Noite'),
+            Turno(nome='Madrugada')
+        ]
+        for turno in turnos:
+            db.session.add(turno)
+    
+    # Inserir dados de exemplo para unidades
+    if not Unidade.query.first():
+        unidades = [
+            Unidade(nome='Unidade A'),
+            Unidade(nome='Unidade B'),
+            Unidade(nome='Unidade C')
+        ]
+        for unidade in unidades:
+            db.session.add(unidade)
+    
+    # Inserir dados de exemplo para não conformidades
+    if not NaoConformidade.query.first():
+        nao_conformidades = [
+            NaoConformidade(nome='Equipamento com defeito'),
+            NaoConformidade(nome='Vazamento'),
+            NaoConformidade(nome='Problema elétrico'),
+            NaoConformidade(nome='Limpeza necessária'),
+            NaoConformidade(nome='Manutenção preventiva')
+        ]
+        for nc in nao_conformidades:
+            db.session.add(nc)
+    
+    # Inserir dados de exemplo para locais de apontamento
+    if not LocalApontamento.query.first():
+        locais = [
+            LocalApontamento(nome='Área de Produção'),
+            LocalApontamento(nome='Escritório'),
+            LocalApontamento(nome='Almoxarifado'),
+            LocalApontamento(nome='Área Externa'),
+            LocalApontamento(nome='Banheiros')
+        ]
+        for local in locais:
+            db.session.add(local)
+    
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao inserir dados iniciais: {e}")
 
-try:
+with app.app_context():
+    # Importa todos os modelos
+    from src.models.chamado import Chamado
+    from src.models.turno import Turno
+    from src.models.unidade import Unidade
+    from src.models.nao_conformidade import NaoConformidade
+    from src.models.local_apontamento import LocalApontamento
+    from src.models.status_chamado import StatusChamado
+    from src.models.perfil import Perfil
     from src.models.historico_chamado import HistoricoChamado
-except ImportError:
-    HistoricoChamado = None
-
-try:
-    from src.models.contato_notificacao import ContatoNotificacao
-except ImportError:
-    ContatoNotificacao = None
-
-try:
+    from src.models.contato_notificacao import ContatoNotificacaoManutencao
     from src.models.historico_notificacoes import HistoricoNotificacoes
-except ImportError:
-    HistoricoNotificacoes = None
+    
+    # Cria todas as tabelas
+    db.create_all()
+    
+    # Insere dados iniciais
+    inserir_dados_iniciais()
 
-# Importar blueprints com tratamento de erro
-try:
-    from src.routes.chamado import chamado_bp
-except ImportError:
-    chamado_bp = None
-
-try:
-    from src.routes.admin import admin_bp
-except ImportError:
-    admin_bp = None
-
-try:
-    from src.routes.auth import admin_auth
-except ImportError:
-    admin_auth = None
-
-try:
-    from src.routes.notificacao import notificacao_bp
-except ImportError:
-    notificacao_bp = None
-
-def create_app():
-    """Factory function para criar a aplicação Flask"""
-    app = Flask(__name__)
-    app.config.from_object(Config)
-    
-    # Configurar CORS
-    CORS(app)
-    
-    # Inicializar banco de dados
-    db.init_app(app)
-    
-    # Registrar blueprints apenas se existirem
-    if chamado_bp:
-        app.register_blueprint(chamado_bp)
-    
-    if admin_bp:
-        app.register_blueprint(admin_bp, url_prefix='/admin')
-    
-    if admin_auth:
-        app.register_blueprint(admin_auth)
-    
-    if notificacao_bp:
-        app.register_blueprint(notificacao_bp, url_prefix='/notificacoes')
-    
-    # Rota básica para teste
-    @app.route('/')
-    def index():
-        return render_template('index.html') if os.path.exists('src/templates/index.html') else "Sistema de Chamados - Em funcionamento!"
-    
-    # Rota de saúde para Railway
-    @app.route('/health')
-    def health():
-        return {"status": "ok", "message": "Sistema funcionando"}
-    
-    # Criar tabelas se necessário
-    with app.app_context():
-        try:
-            db.create_all()
-            print("✅ Banco de dados inicializado")
-        except Exception as e:
-            print(f"⚠️ Erro ao inicializar banco: {e}")
-    
-    return app
-
-# Criar aplicação
-app = create_app()
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_from_directory(app.static_folder, filename)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=5001, debug=True)
 
