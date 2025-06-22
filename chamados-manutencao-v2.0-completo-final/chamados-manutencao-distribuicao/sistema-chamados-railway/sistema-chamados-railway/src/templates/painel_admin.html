@@ -1,0 +1,813 @@
+{% extends "base.html" %}
+
+{% block title %}Painel Administrativo - Sistema de Chamados{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="text-primary">
+                    <i class="bi bi-gear"></i> Painel Administrativo
+                </h2>
+                <div>
+                    <a href="{{ url_for('chamado.painel_supervisor') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left"></i> Voltar ao Painel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabs de Navegação -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="turnos-tab" data-bs-toggle="tab" data-bs-target="#turnos" type="button" role="tab">
+                        <i class="bi bi-clock"></i> Turnos
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="unidades-tab" data-bs-toggle="tab" data-bs-target="#unidades" type="button" role="tab">
+                        <i class="bi bi-building"></i> Unidades
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="locais-tab" data-bs-toggle="tab" data-bs-target="#locais" type="button" role="tab">
+                        <i class="bi bi-geo-alt"></i> Locais
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="nao-conformidades-tab" data-bs-toggle="tab" data-bs-target="#nao-conformidades" type="button" role="tab">
+                        <i class="bi bi-exclamation-triangle"></i> Não Conformidades
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="status-tab" data-bs-toggle="tab" data-bs-target="#status" type="button" role="tab">
+                        <i class="bi bi-flag"></i> Status
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="perfis-tab" data-bs-toggle="tab" data-bs-target="#perfis" type="button" role="tab">
+                        <i class="bi bi-people"></i> Perfis
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Conteúdo das Tabs -->
+    <div class="tab-content" id="adminTabsContent">
+        
+        <!-- Tab Turnos -->
+        <div class="tab-pane fade show active" id="turnos" role="tabpanel">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock"></i> Gerenciar Turnos
+                    </h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTurno">
+                        <i class="bi bi-plus"></i> Novo Turno
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tableTurnos">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Ativo</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Unidades -->
+        <div class="tab-pane fade" id="unidades" role="tabpanel">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-building"></i> Gerenciar Unidades
+                    </h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalUnidade">
+                        <i class="bi bi-plus"></i> Nova Unidade
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tableUnidades">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Ativo</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Locais -->
+        <div class="tab-pane fade" id="locais" role="tabpanel">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-geo-alt"></i> Gerenciar Locais de Apontamento
+                    </h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalLocal">
+                        <i class="bi bi-plus"></i> Novo Local
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tableLocais">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Ativo</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Não Conformidades -->
+        <div class="tab-pane fade" id="nao-conformidades" role="tabpanel">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Gerenciar Não Conformidades
+                    </h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNaoConformidade">
+                        <i class="bi bi-plus"></i> Nova Não Conformidade
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tableNaoConformidades">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Ativo</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Status -->
+        <div class="tab-pane fade" id="status" role="tabpanel">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-flag"></i> Gerenciar Status dos Chamados
+                    </h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalStatus">
+                        <i class="bi bi-plus"></i> Novo Status
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tableStatus">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Cor</th>
+                                    <th>Ordem</th>
+                                    <th>Ativo</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Perfis -->
+        <div class="tab-pane fade" id="perfis" role="tabpanel">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people"></i> Gerenciar Perfis de Usuário
+                    </h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalPerfil">
+                        <i class="bi bi-plus"></i> Novo Perfil
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tablePerfis">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Permissões</th>
+                                    <th>Ativo</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modais para CRUD -->
+<!-- Modal Turno -->
+<div class="modal fade" id="modalTurno" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-clock"></i> <span id="modalTurnoTitle">Novo Turno</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formTurno">
+                <div class="modal-body">
+                    <input type="hidden" id="turnoId" name="id">
+                    <div class="mb-3">
+                        <label for="turnoNome" class="form-label">Nome *</label>
+                        <input type="text" class="form-control" id="turnoNome" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="turnoDescricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="turnoDescricao" name="descricao" rows="3"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="turnoAtivo" name="ativo" checked>
+                        <label class="form-check-label" for="turnoAtivo">Ativo</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Unidade -->
+<div class="modal fade" id="modalUnidade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-building"></i> <span id="modalUnidadeTitle">Nova Unidade</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formUnidade">
+                <div class="modal-body">
+                    <input type="hidden" id="unidadeId" name="id">
+                    <div class="mb-3">
+                        <label for="unidadeNome" class="form-label">Nome *</label>
+                        <input type="text" class="form-control" id="unidadeNome" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="unidadeDescricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="unidadeDescricao" name="descricao" rows="3"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="unidadeAtivo" name="ativo" checked>
+                        <label class="form-check-label" for="unidadeAtivo">Ativo</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Local -->
+<div class="modal fade" id="modalLocal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-geo-alt"></i> <span id="modalLocalTitle">Novo Local</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formLocal">
+                <div class="modal-body">
+                    <input type="hidden" id="localId" name="id">
+                    <div class="mb-3">
+                        <label for="localNome" class="form-label">Nome *</label>
+                        <input type="text" class="form-control" id="localNome" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="localDescricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="localDescricao" name="descricao" rows="3"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="localAtivo" name="ativo" checked>
+                        <label class="form-check-label" for="localAtivo">Ativo</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Não Conformidade -->
+<div class="modal fade" id="modalNaoConformidade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> <span id="modalNaoConformidadeTitle">Nova Não Conformidade</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formNaoConformidade">
+                <div class="modal-body">
+                    <input type="hidden" id="naoConformidadeId" name="id">
+                    <div class="mb-3">
+                        <label for="naoConformidadeNome" class="form-label">Nome *</label>
+                        <input type="text" class="form-control" id="naoConformidadeNome" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="naoConformidadeDescricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="naoConformidadeDescricao" name="descricao" rows="3"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="naoConformidadeAtivo" name="ativo" checked>
+                        <label class="form-check-label" for="naoConformidadeAtivo">Ativo</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Status -->
+<div class="modal fade" id="modalStatus" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-flag"></i> <span id="modalStatusTitle">Novo Status</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formStatus">
+                <div class="modal-body">
+                    <input type="hidden" id="statusId" name="id">
+                    <div class="mb-3">
+                        <label for="statusNome" class="form-label">Nome *</label>
+                        <input type="text" class="form-control" id="statusNome" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="statusDescricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="statusDescricao" name="descricao" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="statusCor" class="form-label">Cor</label>
+                        <input type="color" class="form-control form-control-color" id="statusCor" name="cor" value="#007bff">
+                    </div>
+                    <div class="mb-3">
+                        <label for="statusOrdem" class="form-label">Ordem</label>
+                        <input type="number" class="form-control" id="statusOrdem" name="ordem" min="1" value="1">
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="statusAtivo" name="ativo" checked>
+                        <label class="form-check-label" for="statusAtivo">Ativo</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Perfil -->
+<div class="modal fade" id="modalPerfil" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-people"></i> <span id="modalPerfilTitle">Novo Perfil</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formPerfil">
+                <div class="modal-body">
+                    <input type="hidden" id="perfilId" name="id">
+                    <div class="mb-3">
+                        <label for="perfilNome" class="form-label">Nome *</label>
+                        <input type="text" class="form-control" id="perfilNome" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="perfilDescricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="perfilDescricao" name="descricao" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Permissões</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="permissaoLer" name="pode_ler" checked>
+                            <label class="form-check-label" for="permissaoLer">Pode Ler</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="permissaoEscrever" name="pode_escrever">
+                            <label class="form-check-label" for="permissaoEscrever">Pode Escrever</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="permissaoEditar" name="pode_editar">
+                            <label class="form-check-label" for="permissaoEditar">Pode Editar</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="permissaoExcluir" name="pode_excluir">
+                            <label class="form-check-label" for="permissaoExcluir">Pode Excluir</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="permissaoAdmin" name="e_admin">
+                            <label class="form-check-label" for="permissaoAdmin">É Administrador</label>
+                        </div>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="perfilAtivo" name="ativo" checked>
+                        <label class="form-check-label" for="perfilAtivo">Ativo</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuração das entidades
+    const entidades = {
+        turnos: {
+            endpoint: '/admin/turnos',
+            table: 'tableTurnos',
+            modal: 'modalTurno',
+            form: 'formTurno',
+            campos: ['nome', 'descricao', 'ativo']
+        },
+        unidades: {
+            endpoint: '/admin/unidades',
+            table: 'tableUnidades',
+            modal: 'modalUnidade',
+            form: 'formUnidade',
+            campos: ['nome', 'descricao', 'ativo']
+        },
+        locais: {
+            endpoint: '/admin/locais-apontamento',
+            table: 'tableLocais',
+            modal: 'modalLocal',
+            form: 'formLocal',
+            campos: ['nome', 'descricao', 'ativo']
+        },
+        naoConformidades: {
+            endpoint: '/admin/nao-conformidades',
+            table: 'tableNaoConformidades',
+            modal: 'modalNaoConformidade',
+            form: 'formNaoConformidade',
+            campos: ['nome', 'descricao', 'ativo']
+        },
+        status: {
+            endpoint: '/admin/status-chamado',
+            table: 'tableStatus',
+            modal: 'modalStatus',
+            form: 'formStatus',
+            campos: ['nome', 'descricao', 'cor', 'ordem', 'ativo']
+        },
+        perfis: {
+            endpoint: '/admin/perfis',
+            table: 'tablePerfis',
+            modal: 'modalPerfil',
+            form: 'formPerfil',
+            campos: ['nome', 'descricao', 'pode_ler', 'pode_escrever', 'pode_editar', 'pode_excluir', 'e_admin', 'ativo']
+        }
+    };
+    
+    // Carrega dados quando a tab é ativada
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function(e) {
+            const target = e.target.getAttribute('data-bs-target').replace('#', '');
+            if (entidades[target]) {
+                carregarDados(target);
+            }
+        });
+    });
+    
+    // Carrega dados iniciais (turnos)
+    carregarDados('turnos');
+    
+    // Função para carregar dados
+    function carregarDados(entidade) {
+        const config = entidades[entidade];
+        if (!config) return;
+        
+        fetch(config.endpoint)
+            .then(response => response.json())
+            .then(data => {
+                preencherTabela(config.table, data, entidade);
+            })
+            .catch(error => {
+                console.error('Erro ao carregar dados:', error);
+                mostrarAlerta('Erro ao carregar dados', 'danger');
+            });
+    }
+    
+    // Função para preencher tabela
+    function preencherTabela(tableId, dados, entidade) {
+        const tbody = document.querySelector(`#${tableId} tbody`);
+        tbody.innerHTML = '';
+        
+        dados.forEach(item => {
+            const row = document.createElement('tr');
+            
+            if (entidade === 'status') {
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.nome}</td>
+                    <td>${item.descricao || '-'}</td>
+                    <td><span class="badge" style="background-color: ${item.cor}">${item.cor}</span></td>
+                    <td>${item.ordem}</td>
+                    <td>${item.ativo ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-danger">Não</span>'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editarItem('${entidade}', ${item.id})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="excluirItem('${entidade}', ${item.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+            } else if (entidade === 'perfis') {
+                const permissoes = [];
+                if (item.pode_ler) permissoes.push('Ler');
+                if (item.pode_escrever) permissoes.push('Escrever');
+                if (item.pode_editar) permissoes.push('Editar');
+                if (item.pode_excluir) permissoes.push('Excluir');
+                if (item.e_admin) permissoes.push('Admin');
+                
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.nome}</td>
+                    <td>${item.descricao || '-'}</td>
+                    <td><small>${permissoes.join(', ') || 'Nenhuma'}</small></td>
+                    <td>${item.ativo ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-danger">Não</span>'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editarItem('${entidade}', ${item.id})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="excluirItem('${entidade}', ${item.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+            } else {
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.nome}</td>
+                    <td>${item.descricao || '-'}</td>
+                    <td>${item.ativo ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-danger">Não</span>'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editarItem('${entidade}', ${item.id})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="excluirItem('${entidade}', ${item.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+            }
+            
+            tbody.appendChild(row);
+        });
+    }
+    
+    // Configurar formulários
+    Object.keys(entidades).forEach(entidade => {
+        const config = entidades[entidade];
+        const form = document.getElementById(config.form);
+        
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                salvarItem(entidade);
+            });
+        }
+    });
+    
+    // Função para salvar item
+    function salvarItem(entidade) {
+        const config = entidades[entidade];
+        const form = document.getElementById(config.form);
+        const formData = new FormData(form);
+        const data = {};
+        
+        // Converte FormData para objeto
+        for (let [key, value] of formData.entries()) {
+            if (form.querySelector(`[name="${key}"]`).type === 'checkbox') {
+                data[key] = form.querySelector(`[name="${key}"]`).checked;
+            } else {
+                data[key] = value;
+            }
+        }
+        
+        const id = data.id;
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${config.endpoint}/${id}` : config.endpoint;
+        
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                mostrarAlerta('Item salvo com sucesso!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById(config.modal)).hide();
+                carregarDados(entidade);
+                form.reset();
+            } else {
+                mostrarAlerta(result.message || 'Erro ao salvar item', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            mostrarAlerta('Erro ao salvar item', 'danger');
+        });
+    }
+    
+    // Funções globais
+    window.editarItem = function(entidade, id) {
+        const config = entidades[entidade];
+        
+        fetch(`${config.endpoint}/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                const form = document.getElementById(config.form);
+                
+                // Preenche o formulário
+                Object.keys(data).forEach(key => {
+                    const field = form.querySelector(`[name="${key}"]`);
+                    if (field) {
+                        if (field.type === 'checkbox') {
+                            field.checked = data[key];
+                        } else {
+                            field.value = data[key];
+                        }
+                    }
+                });
+                
+                // Atualiza título do modal
+                const titleElement = document.querySelector(`#${config.modal} .modal-title span`);
+                if (titleElement) {
+                    titleElement.textContent = `Editar ${entidade.charAt(0).toUpperCase() + entidade.slice(1)}`;
+                }
+                
+                // Mostra o modal
+                new bootstrap.Modal(document.getElementById(config.modal)).show();
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                mostrarAlerta('Erro ao carregar item para edição', 'danger');
+            });
+    };
+    
+    window.excluirItem = function(entidade, id) {
+        if (!confirm('Tem certeza que deseja excluir este item?')) {
+            return;
+        }
+        
+        const config = entidades[entidade];
+        
+        fetch(`${config.endpoint}/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                mostrarAlerta('Item excluído com sucesso!', 'success');
+                carregarDados(entidade);
+            } else {
+                mostrarAlerta(result.message || 'Erro ao excluir item', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            mostrarAlerta('Erro ao excluir item', 'danger');
+        });
+    };
+    
+    // Função para mostrar alertas
+    function mostrarAlerta(mensagem, tipo) {
+        const alertContainer = document.createElement('div');
+        alertContainer.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
+        alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alertContainer.innerHTML = `
+            ${mensagem}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(alertContainer);
+        
+        // Remove automaticamente após 5 segundos
+        setTimeout(() => {
+            if (alertContainer.parentNode) {
+                alertContainer.remove();
+            }
+        }, 5000);
+    }
+    
+    // Limpa formulários quando modais são fechados
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('hidden.bs.modal', function() {
+            const form = this.querySelector('form');
+            if (form) {
+                form.reset();
+                // Limpa campo hidden de ID
+                const idField = form.querySelector('input[type="hidden"]');
+                if (idField) {
+                    idField.value = '';
+                }
+                
+                // Restaura título original do modal
+                const titleSpan = this.querySelector('.modal-title span');
+                if (titleSpan) {
+                    const originalText = titleSpan.textContent.replace('Editar', 'Novo');
+                    titleSpan.textContent = originalText;
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+

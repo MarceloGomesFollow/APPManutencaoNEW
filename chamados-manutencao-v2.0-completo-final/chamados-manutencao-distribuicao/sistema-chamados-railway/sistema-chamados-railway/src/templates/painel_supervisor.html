@@ -1,0 +1,634 @@
+{% extends "base.html" %}
+
+{% block title %}Painel Supervisor - Sistema de Chamados{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header com Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="text-primary">
+                    <i class="bi bi-speedometer2"></i> Painel do Supervisor
+                </h2>
+                <div>
+                    <a href="{{ url_for('admin.painel_admin') }}" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-gear"></i> Administração
+                    </a>
+                    <a href="{{ url_for('chamado.index') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-house"></i> Página Inicial
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Cards de Estatísticas -->
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">{{ estatisticas.total_chamados or 0 }}</h4>
+                                    <p class="mb-0">Total de Chamados</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-ticket-detailed" style="font-size: 2rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">{{ estatisticas.chamados_abertos or 0 }}</h4>
+                                    <p class="mb-0">Em Aberto</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-clock" style="font-size: 2rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">{{ estatisticas.chamados_andamento or 0 }}</h4>
+                                    <p class="mb-0">Em Andamento</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-gear" style="font-size: 2rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">{{ estatisticas.chamados_concluidos or 0 }}</h4>
+                                    <p class="mb-0">Concluídos</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-check-circle" style="font-size: 2rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtros Avançados -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-funnel"></i> Filtros Avançados
+                        <button class="btn btn-sm btn-outline-secondary float-end" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosAvancados">
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                    </h5>
+                </div>
+                <div class="collapse" id="filtrosAvancados">
+                    <div class="card-body">
+                        <form id="formFiltros">
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <label for="filtroStatus" class="form-label">Status</label>
+                                    <select class="form-select" id="filtroStatus" name="status">
+                                        <option value="">Todos</option>
+                                        <option value="aberto">Aberto</option>
+                                        <option value="em_andamento">Em Andamento</option>
+                                        <option value="aguardando_material">Aguardando Material</option>
+                                        <option value="concluido">Concluído</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="filtroPrioridade" class="form-label">Prioridade</label>
+                                    <select class="form-select" id="filtroPrioridade" name="prioridade">
+                                        <option value="">Todas</option>
+                                        <option value="alta">Alta</option>
+                                        <option value="media">Média</option>
+                                        <option value="baixa">Baixa</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="filtroTurno" class="form-label">Turno</label>
+                                    <select class="form-select" id="filtroTurno" name="turno">
+                                        <option value="">Todos</option>
+                                        {% if dados and dados.turnos %}
+                                            {% for turno in dados.turnos %}
+                                                <option value="{{ turno.id }}">{{ turno.nome }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="filtroUnidade" class="form-label">Unidade</label>
+                                    <select class="form-select" id="filtroUnidade" name="unidade">
+                                        <option value="">Todas</option>
+                                        {% if dados and dados.unidades %}
+                                            {% for unidade in dados.unidades %}
+                                                <option value="{{ unidade.id }}">{{ unidade.nome }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="filtroDataInicio" class="form-label">Data Início</label>
+                                    <input type="date" class="form-control" id="filtroDataInicio" name="data_inicio">
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="filtroDataFim" class="form-label">Data Fim</label>
+                                    <input type="date" class="form-control" id="filtroDataFim" name="data_fim">
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="filtroBusca" class="form-label">Busca Geral</label>
+                                    <input type="text" class="form-control" id="filtroBusca" name="busca" placeholder="Protocolo, título, cliente...">
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-search"></i> Aplicar Filtros
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="limparFiltros()">
+                                        <i class="bi bi-x-circle"></i> Limpar
+                                    </button>
+                                    <button type="button" class="btn btn-outline-info" onclick="exportarDados()">
+                                        <i class="bi bi-download"></i> Exportar
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Lista de Chamados -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-ul"></i> Lista de Chamados
+                    </h5>
+                    <div>
+                        <span class="badge bg-secondary" id="totalChamados">
+                            {{ chamados|length if chamados else 0 }} chamados
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tableChamados">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Protocolo</th>
+                                    <th>Título</th>
+                                    <th>Cliente</th>
+                                    <th>Prioridade</th>
+                                    <th>Status</th>
+                                    <th>Turno</th>
+                                    <th>Unidade</th>
+                                    <th>Data Abertura</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyChamados">
+                                {% if chamados %}
+                                    {% for chamado in chamados %}
+                                    <tr data-chamado-id="{{ chamado.id }}">
+                                        <td>
+                                            <strong class="text-primary">#{{ chamado.protocolo or chamado.id[:8] }}</strong>
+                                        </td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 200px;" title="{{ chamado.titulo }}">
+                                                {{ chamado.titulo }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ chamado.cliente_nome }}</strong><br>
+                                                <small class="text-muted">{{ chamado.cliente_email }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if chamado.prioridade == 'alta' %}bg-danger
+                                                {% elif chamado.prioridade == 'media' %}bg-warning
+                                                {% else %}bg-success{% endif %}">
+                                                {% if chamado.prioridade == 'alta' %}🔴 Alta
+                                                {% elif chamado.prioridade == 'media' %}🟡 Média
+                                                {% else %}🟢 Baixa{% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <select class="form-select form-select-sm status-select" 
+                                                    data-chamado-id="{{ chamado.id }}" 
+                                                    data-status-atual="{{ chamado.status }}">
+                                                <option value="aberto" {% if chamado.status == 'aberto' %}selected{% endif %}>
+                                                    🟢 Aberto
+                                                </option>
+                                                <option value="em_andamento" {% if chamado.status == 'em_andamento' %}selected{% endif %}>
+                                                    🟡 Em Andamento
+                                                </option>
+                                                <option value="aguardando_material" {% if chamado.status == 'aguardando_material' %}selected{% endif %}>
+                                                    🟠 Aguardando Material
+                                                </option>
+                                                <option value="concluido" {% if chamado.status == 'concluido' %}selected{% endif %}>
+                                                    ✅ Concluído
+                                                </option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <small>{{ chamado.turno_nome or '-' }}</small>
+                                        </td>
+                                        <td>
+                                            <small>{{ chamado.unidade_nome or '-' }}</small>
+                                        </td>
+                                        <td>
+                                            <small>{{ chamado.data_abertura }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{{ url_for('chamado.detalhes_chamado', id=chamado.id) }}" 
+                                                   class="btn btn-outline-info" title="Ver Detalhes">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <button class="btn btn-outline-primary" 
+                                                        onclick="abrirModalResposta('{{ chamado.id }}')" 
+                                                        title="Responder">
+                                                    <i class="bi bi-chat-dots"></i>
+                                                </button>
+                                                <button class="btn btn-outline-success" 
+                                                        onclick="abrirModalAcao('{{ chamado.id }}')" 
+                                                        title="Registrar Ação">
+                                                    <i class="bi bi-tools"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="9" class="text-center py-4">
+                                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                            <p class="text-muted mt-2">Nenhum chamado encontrado</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Resposta Técnica -->
+<div class="modal fade" id="modalResposta" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-chat-dots"></i> Resposta Técnica
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formResposta">
+                <div class="modal-body">
+                    <input type="hidden" id="respostaChamadoId" name="chamado_id">
+                    
+                    <div class="mb-3">
+                        <label for="respostaTecnico" class="form-label">Resposta do Técnico *</label>
+                        <textarea class="form-control" id="respostaTecnico" name="resposta_tecnico" 
+                                  rows="5" required placeholder="Digite sua resposta técnica detalhada..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="respostaStatus" class="form-label">Alterar Status</label>
+                        <select class="form-select" id="respostaStatus" name="status">
+                            <option value="">Manter status atual</option>
+                            <option value="em_andamento">🟡 Em Andamento</option>
+                            <option value="aguardando_material">🟠 Aguardando Material</option>
+                            <option value="concluido">✅ Concluído</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="notificarCliente" name="notificar_cliente" checked>
+                        <label class="form-check-label" for="notificarCliente">
+                            Notificar cliente por e-mail
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Enviar Resposta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Registrar Ação -->
+<div class="modal fade" id="modalAcao" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-tools"></i> Registrar Ação Tomada
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formAcao">
+                <div class="modal-body">
+                    <input type="hidden" id="acaoChamadoId" name="chamado_id">
+                    
+                    <div class="mb-3">
+                        <label for="acaoTomada" class="form-label">Ação Tomada *</label>
+                        <textarea class="form-control" id="acaoTomada" name="acao_tomada" 
+                                  rows="5" required placeholder="Descreva detalhadamente a ação realizada..."></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="acaoDataInicio" class="form-label">Data/Hora Início</label>
+                            <input type="datetime-local" class="form-control" id="acaoDataInicio" name="data_inicio_atendimento">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="acaoDataConclusao" class="form-label">Data/Hora Conclusão</label>
+                            <input type="datetime-local" class="form-control" id="acaoDataConclusao" name="data_conclusao">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="acaoStatus" class="form-label">Status Final *</label>
+                        <select class="form-select" id="acaoStatus" name="status" required>
+                            <option value="em_andamento">🟡 Em Andamento</option>
+                            <option value="aguardando_material">🟠 Aguardando Material</option>
+                            <option value="concluido">✅ Concluído</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="notificarClienteAcao" name="notificar_cliente" checked>
+                        <label class="form-check-label" for="notificarClienteAcao">
+                            Notificar cliente por e-mail
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Registrar Ação
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mudança de status inline
+    document.querySelectorAll('.status-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const chamadoId = this.dataset.chamadoId;
+            const novoStatus = this.value;
+            const statusAtual = this.dataset.statusAtual;
+            
+            if (novoStatus !== statusAtual) {
+                alterarStatus(chamadoId, novoStatus, this);
+            }
+        });
+    });
+    
+    // Formulário de filtros
+    document.getElementById('formFiltros').addEventListener('submit', function(e) {
+        e.preventDefault();
+        aplicarFiltros();
+    });
+    
+    // Formulário de resposta
+    document.getElementById('formResposta').addEventListener('submit', function(e) {
+        e.preventDefault();
+        enviarResposta();
+    });
+    
+    // Formulário de ação
+    document.getElementById('formAcao').addEventListener('submit', function(e) {
+        e.preventDefault();
+        registrarAcao();
+    });
+    
+    // Auto-refresh a cada 30 segundos
+    setInterval(function() {
+        if (!document.querySelector('.modal.show')) {
+            location.reload();
+        }
+    }, 30000);
+});
+
+// Função para alterar status
+function alterarStatus(chamadoId, novoStatus, selectElement) {
+    const statusAtual = selectElement.dataset.statusAtual;
+    
+    fetch(`/chamado/${chamadoId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            status: novoStatus,
+            status_anterior: statusAtual
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            selectElement.dataset.statusAtual = novoStatus;
+            mostrarAlerta('Status alterado com sucesso!', 'success');
+            
+            // Atualiza estatísticas
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            // Reverte o select
+            selectElement.value = statusAtual;
+            mostrarAlerta(data.message || 'Erro ao alterar status', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        selectElement.value = statusAtual;
+        mostrarAlerta('Erro ao alterar status', 'danger');
+    });
+}
+
+// Função para abrir modal de resposta
+function abrirModalResposta(chamadoId) {
+    document.getElementById('respostaChamadoId').value = chamadoId;
+    document.getElementById('formResposta').reset();
+    document.getElementById('respostaChamadoId').value = chamadoId;
+    new bootstrap.Modal(document.getElementById('modalResposta')).show();
+}
+
+// Função para abrir modal de ação
+function abrirModalAcao(chamadoId) {
+    document.getElementById('acaoChamadoId').value = chamadoId;
+    document.getElementById('formAcao').reset();
+    document.getElementById('acaoChamadoId').value = chamadoId;
+    
+    // Define data/hora atual para início
+    const agora = new Date();
+    agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset());
+    document.getElementById('acaoDataInicio').value = agora.toISOString().slice(0, 16);
+    
+    new bootstrap.Modal(document.getElementById('modalAcao')).show();
+}
+
+// Função para enviar resposta
+function enviarResposta() {
+    const formData = new FormData(document.getElementById('formResposta'));
+    const data = Object.fromEntries(formData.entries());
+    data.notificar_cliente = document.getElementById('notificarCliente').checked;
+    
+    fetch('/chamado/resposta', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            mostrarAlerta('Resposta enviada com sucesso!', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('modalResposta')).hide();
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            mostrarAlerta(result.message || 'Erro ao enviar resposta', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        mostrarAlerta('Erro ao enviar resposta', 'danger');
+    });
+}
+
+// Função para registrar ação
+function registrarAcao() {
+    const formData = new FormData(document.getElementById('formAcao'));
+    const data = Object.fromEntries(formData.entries());
+    data.notificar_cliente = document.getElementById('notificarClienteAcao').checked;
+    
+    fetch('/chamado/acao', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            mostrarAlerta('Ação registrada com sucesso!', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('modalAcao')).hide();
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            mostrarAlerta(result.message || 'Erro ao registrar ação', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        mostrarAlerta('Erro ao registrar ação', 'danger');
+    });
+}
+
+// Função para aplicar filtros
+function aplicarFiltros() {
+    const formData = new FormData(document.getElementById('formFiltros'));
+    const params = new URLSearchParams();
+    
+    for (let [key, value] of formData.entries()) {
+        if (value) {
+            params.append(key, value);
+        }
+    }
+    
+    window.location.href = `${window.location.pathname}?${params.toString()}`;
+}
+
+// Função para limpar filtros
+function limparFiltros() {
+    document.getElementById('formFiltros').reset();
+    window.location.href = window.location.pathname;
+}
+
+// Função para exportar dados
+function exportarDados() {
+    const formData = new FormData(document.getElementById('formFiltros'));
+    const params = new URLSearchParams();
+    
+    for (let [key, value] of formData.entries()) {
+        if (value) {
+            params.append(key, value);
+        }
+    }
+    
+    params.append('export', 'csv');
+    window.open(`/chamado/export?${params.toString()}`, '_blank');
+}
+
+// Função para mostrar alertas
+function mostrarAlerta(mensagem, tipo) {
+    const alertContainer = document.createElement('div');
+    alertContainer.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
+    alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertContainer.innerHTML = `
+        ${mensagem}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertContainer);
+    
+    // Remove automaticamente após 5 segundos
+    setTimeout(() => {
+        if (alertContainer.parentNode) {
+            alertContainer.remove();
+        }
+    }, 5000);
+}
+</script>
+{% endblock %}
+

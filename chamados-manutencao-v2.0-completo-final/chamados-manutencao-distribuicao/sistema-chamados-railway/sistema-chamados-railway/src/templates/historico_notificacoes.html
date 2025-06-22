@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Notificações - Sistema de Chamados</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .status-badge {
+            font-size: 0.8em;
+            padding: 0.25em 0.5em;
+        }
+        .card-stats {
+            border-left: 4px solid #007bff;
+        }
+        .card-stats.success {
+            border-left-color: #28a745;
+        }
+        .card-stats.danger {
+            border-left-color: #dc3545;
+        }
+        .card-stats.warning {
+            border-left-color: #ffc107;
+        }
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .filter-section {
+            background-color: #f8f9fa;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-tools"></i> Sistema de Chamados
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/painel-supervisor">
+                    <i class="bi bi-speedometer2"></i> Painel
+                </a>
+                <a class="nav-link" href="/admin">
+                    <i class="bi bi-gear"></i> Administração
+                </a>
+                <a class="nav-link active" href="/notificacoes/historico">
+                    <i class="bi bi-bell"></i> Notificações
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="bi bi-bell"></i> Histórico de Notificações</h2>
+                    <div class="btn-group">
+                        <a href="/notificacoes/contatos" class="btn btn-outline-primary">
+                            <i class="bi bi-people"></i> Gerenciar Contatos
+                        </a>
+                        <button type="button" class="btn btn-warning" onclick="enviarLembretes()">
+                            <i class="bi bi-clock"></i> Enviar Lembretes
+                        </button>
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modalTeste">
+                            <i class="bi bi-envelope-check"></i> Teste de E-mail
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Estatísticas -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <p class="card-category">Total de Notificações</p>
+                                        <h4 class="card-title">{{ estatisticas.total or 0 }}</h4>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="bi bi-envelope fs-2 text-primary"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-stats success">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <p class="card-category">Enviadas com Sucesso</p>
+                                        <h4 class="card-title">{{ estatisticas.sucesso or 0 }}</h4>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="bi bi-check-circle fs-2 text-success"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-stats danger">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <p class="card-category">Com Erro</p>
+                                        <h4 class="card-title">{{ estatisticas.erro or 0 }}</h4>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="bi bi-x-circle fs-2 text-danger"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-stats warning">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <p class="card-category">Últimas 24h</p>
+                                        <h4 class="card-title">{{ estatisticas.ultimas_24h or 0 }}</h4>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="bi bi-clock fs-2 text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="filter-section">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-2">
+                            <label for="chamado_id" class="form-label">Protocolo</label>
+                            <input type="number" class="form-control" id="chamado_id" name="chamado_id" 
+                                   value="{{ filtros.chamado_id or '' }}" placeholder="Ex: 123">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="tipo" class="form-label">Tipo</label>
+                            <select class="form-select" id="tipo" name="tipo">
+                                <option value="">Todos</option>
+                                <option value="abertura" {{ 'selected' if filtros.tipo == 'abertura' }}>Abertura</option>
+                                <option value="atualizacao_status" {{ 'selected' if filtros.tipo == 'atualizacao_status' }}>Atualização Status</option>
+                                <option value="atualizacao_resposta" {{ 'selected' if filtros.tipo == 'atualizacao_resposta' }}>Resposta</option>
+                                <option value="conclusao" {{ 'selected' if filtros.tipo == 'conclusao' }}>Conclusão</option>
+                                <option value="lembrete" {{ 'selected' if filtros.tipo == 'lembrete' }}>Lembrete</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_inicio" class="form-label">Data Início</label>
+                            <input type="date" class="form-control" id="data_inicio" name="data_inicio" 
+                                   value="{{ filtros.data_inicio or '' }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_fim" class="form-label">Data Fim</label>
+                            <input type="date" class="form-control" id="data_fim" name="data_fim" 
+                                   value="{{ filtros.data_fim or '' }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="sucesso" class="form-label">Status</label>
+                            <select class="form-select" id="sucesso" name="sucesso">
+                                <option value="">Todos</option>
+                                <option value="true" {{ 'selected' if filtros.sucesso == 'true' }}>Sucesso</option>
+                                <option value="false" {{ 'selected' if filtros.sucesso == 'false' }}>Erro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bi bi-search"></i> Filtrar
+                            </button>
+                            <a href="/notificacoes/historico" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Tabela de Notificações -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul"></i> Notificações Enviadas
+                            {% if estatisticas.taxa_sucesso is defined %}
+                                <span class="badge bg-{{ 'success' if estatisticas.taxa_sucesso >= 90 else 'warning' if estatisticas.taxa_sucesso >= 70 else 'danger' }} ms-2">
+                                    {{ estatisticas.taxa_sucesso }}% de sucesso
+                                </span>
+                            {% endif %}
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if notificacoes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Protocolo</th>
+                                        <th>Tipo</th>
+                                        <th>Destinatários</th>
+                                        <th>Assunto</th>
+                                        <th>Data/Hora</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for notif in notificacoes %}
+                                    <tr>
+                                        <td>
+                                            <a href="/chamado/{{ notif.chamado_id }}/detalhes" class="text-decoration-none">
+                                                #{{ notif.protocolo }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% set tipo_map = {
+                                                'abertura': 'Abertura',
+                                                'atualizacao_status': 'Status',
+                                                'atualizacao_resposta': 'Resposta',
+                                                'conclusao': 'Conclusão',
+                                                'lembrete': 'Lembrete'
+                                            } %}
+                                            <span class="badge bg-secondary">{{ tipo_map.get(notif.tipo_notificacao, notif.tipo_notificacao) }}</span>
+                                        </td>
+                                        <td>
+                                            <small>{{ notif.destinatarios[:50] }}{% if notif.destinatarios|length > 50 %}...{% endif %}</small>
+                                        </td>
+                                        <td>
+                                            <small>{{ notif.assunto[:40] }}{% if notif.assunto|length > 40 %}...{% endif %}</small>
+                                        </td>
+                                        <td>
+                                            <small>{{ notif.data_envio }}</small>
+                                        </td>
+                                        <td>
+                                            {% if notif.sucesso %}
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle"></i> Enviado
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-danger" title="{{ notif.erro or 'Erro desconhecido' }}">
+                                                    <i class="bi bi-x-circle"></i> Erro
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-info" 
+                                                    onclick="verDetalhes({{ notif.id }}, '{{ notif.assunto }}', '{{ notif.destinatarios }}', '{{ notif.data_envio }}', {{ notif.sucesso|lower }}, '{{ notif.erro or '' }}')">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox display-1 text-muted"></i>
+                            <h5 class="text-muted mt-3">Nenhuma notificação encontrada</h5>
+                            <p class="text-muted">Não há notificações que correspondam aos filtros aplicados.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Teste de E-mail -->
+    <div class="modal fade" id="modalTeste" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-envelope-check"></i> Teste de E-mail
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formTeste">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="emailTeste" class="form-label">E-mail de Destino</label>
+                            <input type="email" class="form-control" id="emailTeste" required 
+                                   placeholder="exemplo@email.com">
+                            <div class="form-text">
+                                Um e-mail de teste será enviado para verificar se o sistema está funcionando.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Enviar Teste
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div class="modal fade" id="modalDetalhes" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-info-circle"></i> Detalhes da Notificação
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Assunto:</strong>
+                            <p id="detalheAssunto"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Data/Hora:</strong>
+                            <p id="detalheData"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Destinatários:</strong>
+                            <p id="detalheDestinatarios"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Status:</strong>
+                            <p id="detalheStatus"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Erro (se houver):</strong>
+                            <p id="detalheErro" class="text-danger"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Enviar teste de e-mail
+        document.getElementById('formTeste').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('emailTeste').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enviando...';
+            btn.disabled = true;
+            
+            fetch('/notificacoes/teste', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `email=${encodeURIComponent(email)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('E-mail de teste enviado com sucesso!');
+                    bootstrap.Modal.getInstance(document.getElementById('modalTeste')).hide();
+                } else {
+                    alert('Erro ao enviar e-mail: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Erro ao enviar e-mail: ' + error.message);
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        });
+
+        // Enviar lembretes
+        function enviarLembretes() {
+            if (confirm('Deseja enviar lembretes para todos os chamados pendentes?')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/notificacoes/lembretes/enviar';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Ver detalhes da notificação
+        function verDetalhes(id, assunto, destinatarios, data, sucesso, erro) {
+            document.getElementById('detalheAssunto').textContent = assunto;
+            document.getElementById('detalheData').textContent = data;
+            document.getElementById('detalheDestinatarios').textContent = destinatarios;
+            document.getElementById('detalheStatus').innerHTML = sucesso ? 
+                '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Enviado com sucesso</span>' :
+                '<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Erro no envio</span>';
+            document.getElementById('detalheErro').textContent = erro || 'Nenhum erro registrado';
+            
+            new bootstrap.Modal(document.getElementById('modalDetalhes')).show();
+        }
+
+        // Auto-refresh a cada 30 segundos
+        setInterval(function() {
+            if (!document.querySelector('.modal.show')) {
+                location.reload();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
+

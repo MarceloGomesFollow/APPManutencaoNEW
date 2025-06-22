@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+
+{% block title %}Chamado #{{ chamado.protocolo }} - Detalhes{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Informações Principais -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="bi bi-ticket-detailed"></i> 
+                            Chamado #{{ chamado.protocolo }}
+                        </h4>
+                        <span class="badge bg-light text-dark fs-6">
+                            {% if chamado.status == 'aberto' %}
+                                🟢 Aberto
+                            {% elif chamado.status == 'em_andamento' %}
+                                🟡 Em Andamento
+                            {% elif chamado.status == 'concluido' %}
+                                ✅ Concluído
+                            {% else %}
+                                ⚪ {{ chamado.status|title }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Título e Prioridade -->
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <h5 class="text-primary">{{ chamado.titulo }}</h5>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="badge fs-6
+                                {% if chamado.prioridade == 'alta' %}bg-danger
+                                {% elif chamado.prioridade == 'media' %}bg-warning
+                                {% else %}bg-success{% endif %}">
+                                {% if chamado.prioridade == 'alta' %}🔴 Alta
+                                {% elif chamado.prioridade == 'media' %}🟡 Média
+                                {% else %}🟢 Baixa{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Descrição -->
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2">
+                            <i class="bi bi-chat-text"></i> Descrição do Problema
+                        </h6>
+                        <p class="text-justify">{{ chamado.descricao }}</p>
+                    </div>
+                    
+                    <!-- Informações de Classificação -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">
+                                <i class="bi bi-tags"></i> Classificação
+                            </h6>
+                            <ul class="list-unstyled">
+                                {% if chamado.turno_nome %}
+                                <li><strong>Turno:</strong> {{ chamado.turno_nome }}</li>
+                                {% endif %}
+                                {% if chamado.unidade_nome %}
+                                <li><strong>Unidade:</strong> {{ chamado.unidade_nome }}</li>
+                                {% endif %}
+                                {% if chamado.local_apontamento_nome %}
+                                <li><strong>Local:</strong> {{ chamado.local_apontamento_nome }}</li>
+                                {% endif %}
+                                {% if chamado.nao_conformidade_nome %}
+                                <li><strong>Não Conformidade:</strong> {{ chamado.nao_conformidade_nome }}</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">
+                                <i class="bi bi-person"></i> Solicitante
+                            </h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Nome:</strong> {{ chamado.cliente_nome }}</li>
+                                <li><strong>E-mail:</strong> {{ chamado.cliente_email }}</li>
+                                {% if chamado.cliente_telefone %}
+                                <li><strong>Telefone:</strong> {{ chamado.cliente_telefone }}</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Datas Importantes -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-muted mb-2">
+                                <i class="bi bi-calendar"></i> Datas Importantes
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <small class="text-muted">Abertura:</small><br>
+                                    <strong>{{ chamado.data_abertura }}</strong>
+                                </div>
+                                {% if chamado.data_inicio_atendimento %}
+                                <div class="col-md-4">
+                                    <small class="text-muted">Início Atendimento:</small><br>
+                                    <strong>{{ chamado.data_inicio_atendimento }}</strong>
+                                </div>
+                                {% endif %}
+                                {% if chamado.data_conclusao %}
+                                <div class="col-md-4">
+                                    <small class="text-muted">Conclusão:</small><br>
+                                    <strong>{{ chamado.data_conclusao }}</strong>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Resposta do Técnico -->
+                    {% if chamado.resposta_tecnico %}
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">
+                            <i class="bi bi-tools"></i> Resposta do Técnico
+                        </h6>
+                        <div class="alert alert-info">
+                            {{ chamado.resposta_tecnico }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Ação Tomada -->
+                    {% if chamado.acao_tomada %}
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">
+                            <i class="bi bi-check-circle"></i> Ação Tomada
+                        </h6>
+                        <div class="alert alert-success">
+                            {{ chamado.acao_tomada }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Anexos -->
+                    {% if chamado.anexos %}
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">
+                            <i class="bi bi-paperclip"></i> Anexos
+                        </h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for anexo in chamado.anexos %}
+                            <a href="{{ url_for('chamado.download_arquivo', filename=anexo) }}" 
+                               class="btn btn-outline-primary btn-sm" target="_blank">
+                                <i class="bi bi-download"></i> {{ anexo }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar com Estatísticas e Timeline -->
+        <div class="col-lg-4">
+            <!-- Estatísticas -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="bi bi-graph-up"></i> Estatísticas do Chamado
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if estatisticas %}
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-2">
+                                <h4 class="text-primary mb-0">{{ estatisticas.total_eventos }}</h4>
+                                <small class="text-muted">Total de Eventos</small>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-2">
+                                <h4 class="text-warning mb-0">{{ estatisticas.mudancas_status }}</h4>
+                                <small class="text-muted">Mudanças de Status</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-success mb-0">{{ estatisticas.respostas_tecnico }}</h4>
+                                <small class="text-muted">Respostas Técnicas</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-info mb-0">{{ estatisticas.notificacoes_enviadas }}</h4>
+                                <small class="text-muted">Notificações</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">Carregando estatísticas...</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Ações Rápidas -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">
+                        <i class="bi bi-lightning"></i> Ações Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('chamado.index') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-arrow-left"></i> Voltar à Lista
+                        </a>
+                        <a href="{{ url_for('chamado.abrir_chamado') }}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-plus-circle"></i> Novo Chamado
+                        </a>
+                        <button class="btn btn-outline-info btn-sm" onclick="window.print()">
+                            <i class="bi bi-printer"></i> Imprimir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Timeline -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i> Timeline do Chamado
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if timeline %}
+                    <div class="timeline">
+                        {% for evento in timeline %}
+                        <div class="timeline-item mb-4">
+                            <div class="row">
+                                <div class="col-md-2 text-center">
+                                    <div class="timeline-badge 
+                                        {% if evento.tipo_evento == 'created' %}bg-success
+                                        {% elif evento.tipo_evento == 'status_change' %}bg-warning
+                                        {% elif evento.tipo_evento == 'response' %}bg-info
+                                        {% elif evento.tipo_evento == 'notification_sent' %}bg-secondary
+                                        {% else %}bg-primary{% endif %}">
+                                        {% if evento.tipo_evento == 'created' %}
+                                            <i class="bi bi-plus-circle"></i>
+                                        {% elif evento.tipo_evento == 'status_change' %}
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        {% elif evento.tipo_evento == 'response' %}
+                                            <i class="bi bi-chat-dots"></i>
+                                        {% elif evento.tipo_evento == 'notification_sent' %}
+                                            <i class="bi bi-envelope"></i>
+                                        {% elif evento.tipo_evento == 'comment' %}
+                                            <i class="bi bi-chat-text"></i>
+                                        {% else %}
+                                            <i class="bi bi-circle"></i>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted d-block mt-2">
+                                        {{ evento.data_hora }}
+                                    </small>
+                                </div>
+                                <div class="col-md-10">
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">{{ evento.descricao }}</h6>
+                                        {% if evento.detalhes_adicionais %}
+                                        <div class="mt-2">
+                                            {% if evento.tipo_evento == 'status_change' %}
+                                                <span class="badge bg-light text-dark">
+                                                    {{ evento.detalhes_adicionais.status_anterior }} → {{ evento.detalhes_adicionais.status_novo }}
+                                                </span>
+                                            {% elif evento.tipo_evento == 'response' %}
+                                                <div class="alert alert-light p-2 mt-2">
+                                                    <small>{{ evento.detalhes_adicionais.resposta }}</small>
+                                                </div>
+                                            {% elif evento.tipo_evento == 'notification_sent' %}
+                                                <small class="text-muted">
+                                                    Tipo: {{ evento.detalhes_adicionais.tipo_notificacao }} | 
+                                                    Para: {{ evento.detalhes_adicionais.destinatario }}
+                                                    {% if evento.detalhes_adicionais.sucesso %}
+                                                        <span class="text-success">✓ Enviado</span>
+                                                    {% else %}
+                                                        <span class="text-danger">✗ Falhou</span>
+                                                    {% endif %}
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-clock-history text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">Nenhum evento registrado ainda.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.timeline {
+    position: relative;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 8.33%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+    transform: translateX(-50%);
+}
+
+.timeline-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    position: relative;
+}
+
+.timeline-content::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 20px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid #dee2e6;
+}
+
+.timeline-content::after {
+    content: '';
+    position: absolute;
+    left: -9px;
+    top: 20px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .timeline::before {
+        left: 30px;
+    }
+    
+    .timeline-badge {
+        margin-left: 0;
+    }
+    
+    .timeline-content::before,
+    .timeline-content::after {
+        display: none;
+    }
+}
+
+@media print {
+    .card-header {
+        background-color: #6c757d !important;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .btn {
+        display: none;
+    }
+    
+    .timeline::before {
+        background: #000 !important;
+        -webkit-print-color-adjust: exact;
+    }
+}
+</style>
+{% endblock %}
+

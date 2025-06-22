@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block title %}Abrir Chamado - Sistema de Chamados de Manutenção{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="bi bi-plus-circle"></i> Abrir Novo Chamado de Manutenção
+                    </h3>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data" id="chamadoForm">
+                        
+                        <!-- Dados do Solicitante -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-person"></i> Dados do Solicitante
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="cliente_nome" class="form-label">
+                                    <i class="bi bi-person-fill"></i> Nome Completo *
+                                </label>
+                                <input type="text" class="form-control" id="cliente_nome" name="cliente_nome" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="cliente_email" class="form-label">
+                                    <i class="bi bi-envelope-fill"></i> E-mail *
+                                </label>
+                                <input type="email" class="form-control" id="cliente_email" name="cliente_email" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="cliente_telefone" class="form-label">
+                                    <i class="bi bi-telephone-fill"></i> Telefone
+                                </label>
+                                <input type="tel" class="form-control" id="cliente_telefone" name="cliente_telefone" 
+                                       placeholder="(11) 99999-9999">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="email_requisitante" class="form-label">
+                                    <i class="bi bi-at"></i> E-mail para Notificações
+                                </label>
+                                <input type="email" class="form-control" id="email_requisitante" name="email_requisitante" 
+                                       placeholder="Se diferente do e-mail principal">
+                                <div class="form-text">Deixe em branco para usar o e-mail principal</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Classificação do Chamado -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-tags"></i> Classificação do Chamado
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="id_turno" class="form-label">
+                                    <i class="bi bi-clock"></i> Turno
+                                </label>
+                                <select class="form-select" id="id_turno" name="id_turno">
+                                    <option value="">Selecione o turno</option>
+                                    {% if dados and dados.turnos %}
+                                        {% for turno in dados.turnos %}
+                                            <option value="{{ turno.id }}">{{ turno.nome }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="id_unidade" class="form-label">
+                                    <i class="bi bi-building"></i> Unidade
+                                </label>
+                                <select class="form-select" id="id_unidade" name="id_unidade">
+                                    <option value="">Selecione a unidade</option>
+                                    {% if dados and dados.unidades %}
+                                        {% for unidade in dados.unidades %}
+                                            <option value="{{ unidade.id }}">{{ unidade.nome }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="id_local_apontamento" class="form-label">
+                                    <i class="bi bi-geo-alt"></i> Local de Apontamento
+                                </label>
+                                <select class="form-select" id="id_local_apontamento" name="id_local_apontamento">
+                                    <option value="">Selecione o local</option>
+                                    {% if dados and dados.locais_apontamento %}
+                                        {% for local in dados.locais_apontamento %}
+                                            <option value="{{ local.id }}">{{ local.nome }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="id_nao_conformidade" class="form-label">
+                                    <i class="bi bi-exclamation-triangle"></i> Tipo de Não Conformidade
+                                </label>
+                                <select class="form-select" id="id_nao_conformidade" name="id_nao_conformidade">
+                                    <option value="">Selecione o tipo</option>
+                                    {% if dados and dados.nao_conformidades %}
+                                        {% for nc in dados.nao_conformidades %}
+                                            <option value="{{ nc.id }}">{{ nc.nome }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Detalhes do Problema -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-clipboard"></i> Detalhes do Problema
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-8 mb-3">
+                                <label for="titulo" class="form-label">
+                                    <i class="bi bi-card-text"></i> Título do Chamado *
+                                </label>
+                                <input type="text" class="form-control" id="titulo" name="titulo" required 
+                                       placeholder="Ex: Vazamento na torneira do banheiro">
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="prioridade" class="form-label">
+                                    <i class="bi bi-flag"></i> Prioridade *
+                                </label>
+                                <select class="form-select" id="prioridade" name="prioridade" required>
+                                    <option value="baixa">🟢 Baixa</option>
+                                    <option value="media" selected>🟡 Média</option>
+                                    <option value="alta">🔴 Alta</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12 mb-3">
+                                <label for="descricao" class="form-label">
+                                    <i class="bi bi-chat-text"></i> Descrição Detalhada *
+                                </label>
+                                <textarea class="form-control" id="descricao" name="descricao" rows="5" required
+                                          placeholder="Descreva o problema em detalhes: quando começou, frequência, localização exata, impacto na operação, etc."></textarea>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle"></i>
+                                    Quanto mais detalhes você fornecer, mais rápido e eficiente será o atendimento.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Upload de Arquivos -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-paperclip"></i> Anexos (Opcional)
+                                </h5>
+                            </div>
+                            
+                            <div class="col-12 mb-3">
+                                <label for="anexos" class="form-label">
+                                    <i class="bi bi-cloud-upload"></i> Fotos, Documentos ou Vídeos
+                                </label>
+                                <input type="file" class="form-control" id="anexos" name="anexos" multiple 
+                                       accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.mp4,.avi,.mov">
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle"></i>
+                                    Tipos permitidos: JPG, PNG, GIF, PDF, DOC, DOCX, TXT, MP4, AVI, MOV (máximo 16MB por arquivo)
+                                </div>
+                            </div>
+                            
+                            <!-- Preview de arquivos -->
+                            <div class="col-12">
+                                <div id="file-preview" class="d-none">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="bi bi-files"></i> Arquivos selecionados:
+                                    </h6>
+                                    <div id="file-list" class="d-flex flex-wrap gap-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botões -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('chamado.index') }}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left"></i> Voltar
+                                    </a>
+                                    
+                                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                        <i class="bi bi-check-circle"></i> Abrir Chamado
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Dicas -->
+            <div class="card mt-4 border-success">
+                <div class="card-body">
+                    <h5 class="text-success mb-3">
+                        <i class="bi bi-lightbulb"></i> Dicas para um Atendimento Mais Rápido
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle text-success"></i>
+                                    <strong>Seja específico:</strong> Descreva exatamente onde está o problema
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle text-success"></i>
+                                    <strong>Anexe fotos:</strong> Imagens ajudam a entender melhor o problema
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle text-success"></i>
+                                    <strong>Informe urgência:</strong> Selecione a prioridade correta
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle text-success"></i>
+                                    <strong>Classifique bem:</strong> Use turno, unidade e local corretos
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('anexos');
+    const filePreview = document.getElementById('file-preview');
+    const fileList = document.getElementById('file-list');
+    const form = document.getElementById('chamadoForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const emailPrincipal = document.getElementById('cliente_email');
+    const emailNotificacao = document.getElementById('email_requisitante');
+    
+    // Auto-preenche email de notificação
+    emailPrincipal.addEventListener('blur', function() {
+        if (!emailNotificacao.value && emailPrincipal.value) {
+            emailNotificacao.value = emailPrincipal.value;
+        }
+    });
+    
+    // Preview de arquivos selecionados
+    fileInput.addEventListener('change', function() {
+        const files = Array.from(this.files);
+        
+        if (files.length > 0) {
+            filePreview.classList.remove('d-none');
+            fileList.innerHTML = '';
+            
+            files.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'badge bg-light text-dark border p-2';
+                fileItem.innerHTML = `
+                    <i class="bi bi-file-earmark"></i> ${file.name}
+                    <small class="text-muted">(${formatFileSize(file.size)})</small>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        } else {
+            filePreview.classList.add('d-none');
+        }
+    });
+    
+    // Formatação do tamanho do arquivo
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Validação do formulário
+    form.addEventListener('submit', function(e) {
+        const files = Array.from(fileInput.files);
+        const maxSize = 16 * 1024 * 1024; // 16MB
+        const titulo = document.getElementById('titulo').value.trim();
+        const descricao = document.getElementById('descricao').value.trim();
+        
+        // Validação de campos obrigatórios
+        if (titulo.length < 10) {
+            e.preventDefault();
+            alert('O título deve ter pelo menos 10 caracteres para melhor identificação do problema.');
+            return;
+        }
+        
+        if (descricao.length < 20) {
+            e.preventDefault();
+            alert('A descrição deve ter pelo menos 20 caracteres para melhor compreensão do problema.');
+            return;
+        }
+        
+        // Verifica tamanho dos arquivos
+        for (let file of files) {
+            if (file.size > maxSize) {
+                e.preventDefault();
+                alert(`O arquivo "${file.name}" é muito grande. Tamanho máximo: 16MB`);
+                return;
+            }
+        }
+        
+        // Verifica total de arquivos
+        const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+        if (totalSize > 64 * 1024 * 1024) { // 64MB total
+            e.preventDefault();
+            alert('O tamanho total dos arquivos não pode exceder 64MB');
+            return;
+        }
+        
+        // Mostra loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enviando chamado...';
+    });
+    
+    // Máscara para telefone
+    const telefoneInput = document.getElementById('cliente_telefone');
+    telefoneInput.addEventListener('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length >= 11) {
+            value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+        } else if (value.length >= 7) {
+            value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+        } else if (value.length >= 3) {
+            value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+        }
+        this.value = value;
+    });
+    
+    // Contador de caracteres para descrição
+    const descricaoInput = document.getElementById('descricao');
+    const contadorDiv = document.createElement('div');
+    contadorDiv.className = 'form-text text-end';
+    contadorDiv.id = 'contador-descricao';
+    descricaoInput.parentNode.appendChild(contadorDiv);
+    
+    function atualizarContador() {
+        const length = descricaoInput.value.length;
+        contadorDiv.innerHTML = `${length} caracteres`;
+        if (length < 20) {
+            contadorDiv.className = 'form-text text-end text-danger';
+        } else {
+            contadorDiv.className = 'form-text text-end text-muted';
+        }
+    }
+    
+    descricaoInput.addEventListener('input', atualizarContador);
+    atualizarContador(); // Inicializa o contador
+});
+</script>
+{% endblock %}
+

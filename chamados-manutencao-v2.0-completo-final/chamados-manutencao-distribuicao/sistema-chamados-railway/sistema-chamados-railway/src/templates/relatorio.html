@@ -1,0 +1,560 @@
+{% extends "base.html" %}
+
+{% block title %}Relatórios - Sistema de Chamados{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="text-primary">
+                    <i class="bi bi-graph-up"></i> Relatórios e Estatísticas
+                </h2>
+                <div>
+                    <a href="{{ url_for('chamado.painel_supervisor') }}" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-speedometer2"></i> Painel Supervisor
+                    </a>
+                    <a href="{{ url_for('chamado.index') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-house"></i> Página Inicial
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtros de Período -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calendar-range"></i> Período de Análise
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="formPeriodo" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="dataInicio" class="form-label">Data Início</label>
+                            <input type="date" class="form-control" id="dataInicio" name="data_inicio" 
+                                   value="{{ filtros.data_inicio if filtros else '' }}">
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="dataFim" class="form-label">Data Fim</label>
+                            <input type="date" class="form-control" id="dataFim" name="data_fim" 
+                                   value="{{ filtros.data_fim if filtros else '' }}">
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="filtroUnidade" class="form-label">Unidade</label>
+                            <select class="form-select" id="filtroUnidade" name="unidade">
+                                <option value="">Todas as Unidades</option>
+                                {% if dados and dados.unidades %}
+                                    {% for unidade in dados.unidades %}
+                                        <option value="{{ unidade.id }}" 
+                                                {% if filtros and filtros.unidade == unidade.id|string %}selected{% endif %}>
+                                            {{ unidade.nome }}
+                                        </option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bi bi-search"></i> Filtrar
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="limparFiltros()">
+                                <i class="bi bi-x-circle"></i> Limpar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cards de Estatísticas Gerais -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="mb-0">{{ estatisticas.total_chamados or 0 }}</h3>
+                            <p class="mb-0">Total de Chamados</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-ticket-detailed" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="mb-0">{{ estatisticas.chamados_concluidos or 0 }}</h3>
+                            <p class="mb-0">Concluídos</p>
+                            <small>{{ "%.1f"|format((estatisticas.chamados_concluidos or 0) / (estatisticas.total_chamados or 1) * 100) }}%</small>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-check-circle" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="mb-0">{{ estatisticas.chamados_pendentes or 0 }}</h3>
+                            <p class="mb-0">Pendentes</p>
+                            <small>{{ "%.1f"|format((estatisticas.chamados_pendentes or 0) / (estatisticas.total_chamados or 1) * 100) }}%</small>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-clock" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="mb-0">{{ "%.1f"|format(estatisticas.tempo_medio_resolucao or 0) }}</h3>
+                            <p class="mb-0">Tempo Médio (dias)</p>
+                            <small>Para resolução</small>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-stopwatch" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Gráficos -->
+    <div class="row mb-4">
+        <!-- Gráfico de Status -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pie-chart"></i> Distribuição por Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoStatus" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráfico de Prioridade -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart"></i> Distribuição por Prioridade
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoPrioridade" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráfico de Turnos -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock"></i> Chamados por Turno
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoTurnos" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráfico de Unidades -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-building"></i> Chamados por Unidade
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoUnidades" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Gráfico de Evolução Temporal -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up"></i> Evolução dos Chamados no Tempo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoTemporal" width="800" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabela de Chamados Detalhada -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-table"></i> Detalhamento dos Chamados
+                    </h5>
+                    <div>
+                        <button class="btn btn-outline-success btn-sm" onclick="exportarCSV()">
+                            <i class="bi bi-file-earmark-excel"></i> Exportar CSV
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="exportarPDF()">
+                            <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="tabelaChamados">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Protocolo</th>
+                                    <th>Título</th>
+                                    <th>Cliente</th>
+                                    <th>Prioridade</th>
+                                    <th>Status</th>
+                                    <th>Turno</th>
+                                    <th>Unidade</th>
+                                    <th>Data Abertura</th>
+                                    <th>Data Conclusão</th>
+                                    <th>Tempo Resolução</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if chamados %}
+                                    {% for chamado in chamados %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('chamado.detalhes_chamado', id=chamado.id) }}" 
+                                               class="text-decoration-none">
+                                                <strong>#{{ chamado.protocolo or chamado.id[:8] }}</strong>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 200px;" title="{{ chamado.titulo }}">
+                                                {{ chamado.titulo }}
+                                            </div>
+                                        </td>
+                                        <td>{{ chamado.cliente_nome }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if chamado.prioridade == 'alta' %}bg-danger
+                                                {% elif chamado.prioridade == 'media' %}bg-warning
+                                                {% else %}bg-success{% endif %}">
+                                                {{ chamado.prioridade|title }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if chamado.status == 'concluido' %}bg-success
+                                                {% elif chamado.status == 'em_andamento' %}bg-info
+                                                {% elif chamado.status == 'aguardando_material' %}bg-warning
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ chamado.status|replace('_', ' ')|title }}
+                                            </span>
+                                        </td>
+                                        <td>{{ chamado.turno_nome or '-' }}</td>
+                                        <td>{{ chamado.unidade_nome or '-' }}</td>
+                                        <td>{{ chamado.data_abertura }}</td>
+                                        <td>{{ chamado.data_conclusao or '-' }}</td>
+                                        <td>
+                                            {% if chamado.tempo_resolucao %}
+                                                {{ "%.1f"|format(chamado.tempo_resolucao) }} dias
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="10" class="text-center py-4">
+                                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                            <p class="text-muted mt-2">Nenhum chamado encontrado para o período selecionado</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Dados para os gráficos (vindos do backend)
+    const dadosGraficos = {
+        status: {{ graficos.status|tojson if graficos and graficos.status else '{}' }},
+        prioridade: {{ graficos.prioridade|tojson if graficos and graficos.prioridade else '{}' }},
+        turnos: {{ graficos.turnos|tojson if graficos and graficos.turnos else '{}' }},
+        unidades: {{ graficos.unidades|tojson if graficos and graficos.unidades else '{}' }},
+        temporal: {{ graficos.temporal|tojson if graficos and graficos.temporal else '{}' }}
+    };
+    
+    // Configurações padrão dos gráficos
+    Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+    Chart.defaults.color = '#6c757d';
+    
+    // Gráfico de Status (Pizza)
+    if (dadosGraficos.status && Object.keys(dadosGraficos.status).length > 0) {
+        const ctxStatus = document.getElementById('graficoStatus').getContext('2d');
+        new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(dadosGraficos.status).map(s => s.replace('_', ' ').toUpperCase()),
+                datasets: [{
+                    data: Object.values(dadosGraficos.status),
+                    backgroundColor: [
+                        '#28a745', // Concluído - Verde
+                        '#17a2b8', // Em Andamento - Azul
+                        '#ffc107', // Aguardando Material - Amarelo
+                        '#6c757d'  // Aberto - Cinza
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    
+    // Gráfico de Prioridade (Barras)
+    if (dadosGraficos.prioridade && Object.keys(dadosGraficos.prioridade).length > 0) {
+        const ctxPrioridade = document.getElementById('graficoPrioridade').getContext('2d');
+        new Chart(ctxPrioridade, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(dadosGraficos.prioridade).map(p => p.toUpperCase()),
+                datasets: [{
+                    label: 'Quantidade',
+                    data: Object.values(dadosGraficos.prioridade),
+                    backgroundColor: [
+                        '#dc3545', // Alta - Vermelho
+                        '#ffc107', // Média - Amarelo
+                        '#28a745'  // Baixa - Verde
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+    
+    // Gráfico de Turnos (Barras Horizontais)
+    if (dadosGraficos.turnos && Object.keys(dadosGraficos.turnos).length > 0) {
+        const ctxTurnos = document.getElementById('graficoTurnos').getContext('2d');
+        new Chart(ctxTurnos, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(dadosGraficos.turnos),
+                datasets: [{
+                    label: 'Chamados',
+                    data: Object.values(dadosGraficos.turnos),
+                    backgroundColor: '#007bff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+    
+    // Gráfico de Unidades (Pizza)
+    if (dadosGraficos.unidades && Object.keys(dadosGraficos.unidades).length > 0) {
+        const ctxUnidades = document.getElementById('graficoUnidades').getContext('2d');
+        new Chart(ctxUnidades, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(dadosGraficos.unidades),
+                datasets: [{
+                    data: Object.values(dadosGraficos.unidades),
+                    backgroundColor: [
+                        '#007bff',
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545',
+                        '#6f42c1',
+                        '#fd7e14'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    
+    // Gráfico Temporal (Linha)
+    if (dadosGraficos.temporal && dadosGraficos.temporal.labels && dadosGraficos.temporal.labels.length > 0) {
+        const ctxTemporal = document.getElementById('graficoTemporal').getContext('2d');
+        new Chart(ctxTemporal, {
+            type: 'line',
+            data: {
+                labels: dadosGraficos.temporal.labels,
+                datasets: [
+                    {
+                        label: 'Chamados Abertos',
+                        data: dadosGraficos.temporal.abertos,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Chamados Concluídos',
+                        data: dadosGraficos.temporal.concluidos,
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    }
+    
+    // Formulário de período
+    document.getElementById('formPeriodo').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const params = new URLSearchParams();
+        
+        for (let [key, value] of formData.entries()) {
+            if (value) {
+                params.append(key, value);
+            }
+        }
+        
+        window.location.href = `${window.location.pathname}?${params.toString()}`;
+    });
+});
+
+// Função para limpar filtros
+function limparFiltros() {
+    document.getElementById('formPeriodo').reset();
+    window.location.href = window.location.pathname;
+}
+
+// Função para exportar CSV
+function exportarCSV() {
+    const params = new URLSearchParams(window.location.search);
+    params.set('export', 'csv');
+    window.open(`${window.location.pathname}?${params.toString()}`, '_blank');
+}
+
+// Função para exportar PDF
+function exportarPDF() {
+    const params = new URLSearchParams(window.location.search);
+    params.set('export', 'pdf');
+    window.open(`${window.location.pathname}?${params.toString()}`, '_blank');
+}
+</script>
+{% endblock %}
+
