@@ -1,0 +1,56 @@
+# Ignorar arquivos de ambiente
+.env
+.env.local
+.env.production
+
+# Ignorar arquivos de desenvolvimento
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Ignorar arquivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignorar arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar logs
+*.log
+logs/
+
+# Ignorar uploads (exceto estrutura)
+uploads/*
+!uploads/.gitkeep
+
+# Ignorar backups
+backups/*
+!backups/.gitkeep
+
+# Ignorar certificados SSL
+ssl/*
+!ssl/.gitkeep
+
+# Ignorar banco de dados local
+src/database/
+*.db
+*.sqlite
+
+# Ignorar arquivos temporários
+tmp/
+temp/
+*.tmp
+
+# Ignorar arquivos de build
+build/
+dist/
+*.egg-info/
+

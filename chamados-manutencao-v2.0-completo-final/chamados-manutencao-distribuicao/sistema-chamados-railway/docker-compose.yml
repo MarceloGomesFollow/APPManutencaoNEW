@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # Aplicação Flask
+  app:
+    build: .
+    container_name: chamados-app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://chamados_user:${POSTGRES_PASSWORD}@db:5432/chamados
+      - MAIL_SERVER=${MAIL_SERVER}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USE_TLS=${MAIL_USE_TLS}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - SUPERVISOR_PASSWORD=${SUPERVISOR_PASSWORD}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    networks:
+      - chamados-network
+
+  # Banco de dados PostgreSQL
+  db:
+    image: postgres:13
+    container_name: chamados-db
+    environment:
+      - POSTGRES_DB=chamados
+      - POSTGRES_USER=chamados_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - chamados-network
+
+  # Redis para cache e sessões
+  redis:
+    image: redis:7-alpine
+    container_name: chamados-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - chamados-network
+
+  # Nginx como proxy reverso
+  nginx:
+    image: nginx:alpine
+    container_name: chamados-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/ssl/certs
+      - ./uploads:/var/www/uploads
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - chamados-network
+
+  # Backup automático
+  backup:
+    image: postgres:13
+    container_name: chamados-backup
+    environment:
+      - POSTGRES_DB=chamados
+      - POSTGRES_USER=chamados_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./backups:/backups
+      - ./scripts:/scripts
+    command: >
+      sh -c "
+        while true; do
+          sleep 86400;
+          pg_dump -h db -U chamados_user chamados > /backups/backup_$$(date +%Y%m%d_%H%M%S).sql;
+          find /backups -name '*.sql' -mtime +7 -delete;
+        done
+      "
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - chamados-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  chamados-network:
+    driver: bridge
+
