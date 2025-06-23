@@ -26,7 +26,7 @@ class NaoConformidade(db.Model):
     # -------------------------------
     # 3) Relacionamento com chamados
     # -------------------------------
-    chamados = db.relationship('Chamado', foreign_keys='Chamado.id_nao_conformidade', lazy=True)  # Removido backref='nao_conformidade'
+    chamados = db.relationship('Chamado', foreign_keys='Chamado.id_nao_conformidade', lazy=True, overlaps="nao_conformidade")  # Adicionado overlaps
     
     # -------------------------------
     # 4) Métodos auxiliares
