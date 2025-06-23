@@ -2,13 +2,15 @@ import os
 import sys
 from flask import Flask, send_from_directory, render_template
 from flask_migrate import Migrate, upgrade
-from src.models.user import db
-from src.routes.user import user_bp
-from src.routes.chamado import chamado_bp
-from src.config import Config
 
-# Ajuste o sys.path para incluir o diretório raiz do container
-sys.path.insert(0, '/app')
+# Ajuste o sys.path para incluir o diretório pai de src
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+# Imports relativos ao novo sys.path
+from models.user import db
+from routes.user import user_bp
+from routes.chamado import chamado_bp
+from config import Config
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
@@ -23,17 +25,17 @@ migrate = Migrate(app, db)
 # Registra blueprints
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(chamado_bp)
-from src.routes.admin import admin_bp
+from routes.admin import admin_bp
 app.register_blueprint(admin_bp)
 
 def inserir_dados_iniciais():
     """Insere dados iniciais necessários para o funcionamento do sistema"""
-    from src.models.perfil import Perfil
-    from src.models.status_chamado import StatusChamado
-    from src.models.turno import Turno
-    from src.models.unidade import Unidade
-    from src.models.nao_conformidade import NaoConformidade
-    from src.models.local_apontamento import LocalApontamento
+    from models.perfil import Perfil
+    from models.status_chamado import StatusChamado
+    from models.turno import Turno
+    from models.unidade import Unidade
+    from models.nao_conformidade import NaoConformidade
+    from models.local_apontamento import LocalApontamento
     
     # Inserir perfis padrão
     if not Perfil.query.first():
@@ -110,16 +112,16 @@ def inserir_dados_iniciais():
 
 with app.app_context():
     # Importa todos os modelos
-    from src.models.chamado import Chamado
-    from src.models.turno import Turno
-    from src.models.unidade import Unidade
-    from src.models.nao_conformidade import NaoConformidade
-    from src.models.local_apontamento import LocalApontamento
-    from src.models.status_chamado import StatusChamado
-    from src.models.perfil import Perfil
-    from src.models.historico_chamado import HistoricoChamado
-    from src.models.contato_notificacao import ContatoNotificacaoManutencao
-    from src.models.historico_notificacoes import HistoricoNotificacoes
+    from models.chamado import Chamado
+    from models.turno import Turno
+    from models.unidade import Unidade
+    from models.nao_conformidade import NaoConformidade
+    from models.local_apontamento import LocalApontamento
+    from models.status_chamado import StatusChamado
+    from models.perfil import Perfil
+    from models.historico_chamado import HistoricoChamado
+    from models.contato_notificacao import ContatoNotificacaoManutencao
+    from models.historico_notificacoes import HistoricoNotificacoes
     
     # Aplica migrações antes de inserir dados
     try:
