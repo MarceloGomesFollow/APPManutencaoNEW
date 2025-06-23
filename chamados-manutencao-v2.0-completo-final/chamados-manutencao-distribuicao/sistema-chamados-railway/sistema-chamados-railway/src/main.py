@@ -1,11 +1,12 @@
-# src/main.py
 import os
 import sys
 from flask_migrate import upgrade
-from src import create_app
 
-# Ajuste o sys.path para incluir o diretório pai
+# Ajuste o sys.path para incluir o diretório pai relativo ao main.py
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+# Importa create_app do pacote src
+from . import create_app
 
 app = create_app()
 
@@ -17,7 +18,7 @@ with app.app_context():
         print(f"Erro ao aplicar migrações: {e}")
         raise  # Para depuração, falha se a migração falhar
 
-    # Insere dados iniciais (se desejar manter essa lógica aqui)
+    # Insere dados iniciais
     def inserir_dados_iniciais():
         from models.perfil import Perfil
         from models.status_chamado import StatusChamado
