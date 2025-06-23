@@ -76,13 +76,11 @@ class Chamado(db.Model):
     # 9) Relacionamentos SQLAlchemy
     # -------------------------------
     turno = db.relationship('Turno', backref='chamados_associados', foreign_keys=[id_turno], lazy=True)
-    unidade = db.relationship('Unidade', foreign_keys=[id_unidade], lazy=True)  # Removido backref='chamados'
-    nao_conformidade = db.relationship('NaoConformidade', backref='chamados',
-                                      foreign_keys=[id_nao_conformidade], lazy=True)
-    local_apontamento = db.relationship('LocalApontamento', backref='chamados',
-                                        foreign_keys=[id_local_apontamento], lazy=True)
-    status_chamado = db.relationship('StatusChamado', backref='chamados',
-                                     foreign_keys=[id_status], lazy=True)
+    unidade = db.relationship('Unidade', foreign_keys=[id_unidade], lazy=True)
+    nao_conformidade = db.relationship('NaoConformidade', foreign_keys=[id_nao_conformidade], lazy=True)
+    local_apontamento = db.relationship('LocalApontamento', foreign_keys=[id_local_apontamento], lazy=True)
+    status_chamado = db.relationship('StatusChamado', foreign_keys=[id_status], lazy=True)
+
     # -------------------------------
     # 10) Métodos auxiliares
     # -------------------------------
@@ -120,7 +118,7 @@ class Chamado(db.Model):
             'titulo': self.titulo,
             'descricao': self.descricao,
             'prioridade': self.prioridade,
-            'turno_nome': self.turno.nome if self.turno.chamados_associados else None,
+            'turno_nome': self.turno.nome if self.turno else None,  # Corrigido
             'unidade_nome': self.unidade.nome if self.unidade else None,
             'nao_conformidade_nome': self.nao_conformidade.nome if self.nao_conformidade else None,
             'local_apontamento_nome': self.local_apontamento.nome if self.local_apontamento else None,
