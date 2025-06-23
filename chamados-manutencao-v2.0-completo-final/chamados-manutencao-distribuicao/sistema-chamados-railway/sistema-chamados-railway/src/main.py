@@ -99,3 +99,14 @@ with app.app_context():
 
     # Chama a função de inserção de dados dentro do contexto
     inserir_dados_iniciais()
+
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_from_directory(app.static_folder, filename)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5001, debug=True)
