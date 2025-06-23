@@ -10,7 +10,7 @@ class User(db.Model):
     id_perfil = db.Column(db.Integer, db.ForeignKey('tb_perfis.id'))
     
     # Relacionamento com HistoricoChamado (se aplicável)
-    historico_chamados = db.relationship('HistoricoChamado', backref='usuario', lazy=True)
+    historico_chamados = db.relationship('HistoricoChamado', backref='criado_por', lazy=True)
     
     def to_dict(self):
         return {
