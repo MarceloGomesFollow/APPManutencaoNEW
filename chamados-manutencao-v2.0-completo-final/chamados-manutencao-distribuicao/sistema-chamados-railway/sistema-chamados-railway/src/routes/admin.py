@@ -299,5 +299,5 @@ def painel_admin():
         return render_template('admin/painel.html', estatisticas=estatisticas)
     except Exception as e:
         flash(f'Erro ao carregar painel: {str(e)}', 'error')
-        return render_template('admin/painel.html', estatisticas={})
+        return render_template('admin/painel)admin.html', estatisticas={})
 
