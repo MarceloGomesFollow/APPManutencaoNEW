@@ -6,7 +6,7 @@ from flask_migrate import upgrade
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Importa create_app de forma absoluta
-import src  # Adiciona src ao namespace
+import src
 create_app = src.create_app
 
 app = create_app()
@@ -15,11 +15,12 @@ with app.app_context():
     # Aplica migrações antes de inserir dados
     try:
         upgrade()  # Executa a migração mais recente
+        print("Migrações aplicadas com sucesso")
     except Exception as e:
         print(f"Erro ao aplicar migrações: {e}")
         raise  # Para depuração, falha se a migração falhar
 
-    # Insere dados iniciais
+    # Insere dados iniciais apenas se não existirem
     def inserir_dados_iniciais():
         from models.perfil import Perfil
         from models.status_chamado import StatusChamado
@@ -91,10 +92,11 @@ with app.app_context():
         
         try:
             db.session.commit()
+            print("Dados iniciais inseridos com sucesso")
         except Exception as e:
             db.session.rollback()
             print(f"Erro ao inserir dados iniciais: {e}")
-    
+
     inserir_dados_iniciais()
 
 @app.route('/static/<path:filename>')
