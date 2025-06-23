@@ -4,7 +4,6 @@ import uuid
 
 class Chamado(db.Model):
     __tablename__ = 'tb_chamados'
-    
     id = db.Column(db.Integer, primary_key=True)
     protocolo = db.Column(db.String(4), unique=True, nullable=True)  # Protocolo numérico 0001-9999
     

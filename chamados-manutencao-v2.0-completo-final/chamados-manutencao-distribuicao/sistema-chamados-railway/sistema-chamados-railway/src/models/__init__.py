@@ -1,5 +1,5 @@
 # src/models/__init__.py
 from flask_sqlalchemy import SQLAlchemy
 
-# Instância global de banco de dados
+# essa será a única instância de SQLAlchemy da sua app
 db = SQLAlchemy()
