@@ -39,7 +39,7 @@ try:
     print("📊 Banco não encontrado - criando novo banco...")
     
     # Importar a aplicação Flask usando a factory function
-    from main import create_app
+    from src import create_app
     
     # Criar aplicação
     app = create_app()
