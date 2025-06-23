@@ -1,18 +1,36 @@
+# src/models/unidade.py
+# ===============================
+# Modelo de Unidade
+# ===============================
+
 from src.models import db
 from datetime import datetime
 
 class Unidade(db.Model):
+    """Representa uma unidade associada aos chamados de manutenção."""
+    
+    # -------------------------------
+    # 1) Definição da tabela
+    # -------------------------------
     __tablename__ = 'tb_unidades'
     
+    # -------------------------------
+    # 2) Colunas principais
+    # -------------------------------
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     ativo = db.Column(db.Boolean, default=True, nullable=False)
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     data_atualizacao = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     
-    # Relacionamento com chamados
-    chamados = db.relationship('Chamado', backref='unidade', lazy=True)
+    # -------------------------------
+    # 3) Relacionamento com chamados
+    # -------------------------------
+    chamados = db.relationship('Chamado', foreign_keys='Chamado.id_unidade', lazy=True)  # Removido backref='unidade'
     
+    # -------------------------------
+    # 4) Métodos auxiliares
+    # -------------------------------
     def to_dict(self):
         return {
             'id': self.id,
@@ -24,4 +42,3 @@ class Unidade(db.Model):
     
     def __repr__(self):
         return f'<Unidade {self.nome}>'
-
