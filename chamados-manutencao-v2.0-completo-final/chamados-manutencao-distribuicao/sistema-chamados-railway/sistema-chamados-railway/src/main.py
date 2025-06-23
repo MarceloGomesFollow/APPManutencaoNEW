@@ -7,8 +7,8 @@ from src.routes.user import user_bp
 from src.routes.chamado import chamado_bp
 from src.config import Config
 
-# Ajuste o sys.path para incluir o diretório pai relativo ao main.py
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+# Ajuste o sys.path para incluir o diretório raiz do container
+sys.path.insert(0, '/app')
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
