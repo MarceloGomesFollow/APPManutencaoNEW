@@ -1,4 +1,4 @@
-from src.models import db
+from . import db
 from datetime import datetime
 
 class Turno(db.Model):
