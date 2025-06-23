@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template, flash, redirect, url_for
-from src.models.user import db
+from src.models import db
 from src.models.historico_notificacoes import HistoricoNotificacoes
 from src.models.contato_notificacao import ContatoNotificacaoManutencao
 from src.models.unidade import Unidade
