@@ -1,5 +1,5 @@
 # src/models/perfil.py
-from src.models import db          # ← instancia correta
+from . import db          # ← instancia correta
 from src.models.user import User   # ← importa a classe para registrar no registry
 from datetime import datetime
 

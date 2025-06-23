@@ -3,7 +3,7 @@
 # Modelo de Histórico de Chamado
 # ===============================
 
-from src.models import db
+from . import db
 from datetime import datetime
 
 class HistoricoChamado(db.Model):
@@ -44,7 +44,7 @@ class HistoricoChamado(db.Model):
             'id': self.id,
             'id_chamado': self.id_chamado,
             'id_usuario': self.id_usuario,
-            'usuario_nome': self.usuario.name if self.usuario else 'Sistema',
+            'usuario_nome': self.usuario.username if self.usuario else 'Sistema',
             'tipo_evento': self.tipo_evento,
             'descricao': self.descricao,
             'data_hora': self.data_hora.isoformat() if self.data_hora else None,
