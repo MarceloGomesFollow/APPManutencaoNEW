@@ -2,11 +2,11 @@ import os
 import sys
 from flask_migrate import upgrade
 
-# Ajuste o sys.path para incluir o diretório pai de src
+# Ajuste o sys.path para incluir o diretório raiz do projeto
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-# Importa create_app usando o namespace do pacote src
-from . import create_app  # Import relativo ao diretório src
+# Importa create_app de forma absoluta
+from src import create_app
 
 app = create_app()
 
