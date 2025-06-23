@@ -1,12 +1,13 @@
 import os
 import sys
 from flask import Flask, send_from_directory, render_template
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 from src.models.user import db
 from src.routes.user import user_bp
 from src.routes.chamado import chamado_bp
 from src.config import Config
 
+# Ajuste o sys.path para incluir o diretório pai relativo ao main.py
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
@@ -119,6 +120,13 @@ with app.app_context():
     from src.models.historico_chamado import HistoricoChamado
     from src.models.contato_notificacao import ContatoNotificacaoManutencao
     from src.models.historico_notificacoes import HistoricoNotificacoes
+    
+    # Aplica migrações antes de inserir dados
+    try:
+        upgrade()  # Executa a migração mais recente
+    except Exception as e:
+        print(f"Erro ao aplicar migrações: {e}")
+        raise  # Para depuração, falha se a migração falhar
     
     # Insere dados iniciais
     inserir_dados_iniciais()
