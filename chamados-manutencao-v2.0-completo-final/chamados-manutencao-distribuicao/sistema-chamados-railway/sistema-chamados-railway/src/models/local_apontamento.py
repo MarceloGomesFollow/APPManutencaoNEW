@@ -39,8 +39,9 @@ class LocalApontamento(db.Model):
     chamados = db.relationship(
         'Chamado',
         foreign_keys='Chamado.id_local_apontamento',
-        lazy='selectin'
-    )  # Removido backref='local_apontamento'
+        lazy='selectin',
+        overlaps="local_apontamento"  # Adicionado para silenciar o aviso
+    )
 
     # -------------------------------
     # 4) Métodos auxiliares

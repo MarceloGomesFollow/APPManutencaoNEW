@@ -17,7 +17,7 @@ class StatusChamado(db.Model):
     # -------------------------------
     # 2) Relacionamento com chamados
     # -------------------------------
-    chamados = db.relationship('Chamado', foreign_keys='Chamado.id_status', lazy=True)  # Removido backref='status_chamado'
+    chamados = db.relationship('Chamado', foreign_keys='Chamado.id_status', lazy=True, overlaps="status_chamado")  # Adicionado overlaps
     
     # -------------------------------
     # 3) Métodos auxiliares
