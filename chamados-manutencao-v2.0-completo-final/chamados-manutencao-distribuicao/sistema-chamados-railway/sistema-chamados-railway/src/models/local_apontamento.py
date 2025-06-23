@@ -1,9 +1,9 @@
-# src/models/local_apontamento.py
+## src/models/local_apontamento.py
 # ===============================
 # Modelo de Local de Apontamento
 # ===============================
 
-from src.models import db
+from models import db  # import absoluto para instância SQLAlchemy
 from datetime import datetime
 
 class LocalApontamento(db.Model):
@@ -13,6 +13,7 @@ class LocalApontamento(db.Model):
     # 1) Definição da tabela
     # -------------------------------
     __tablename__ = 'tb_locais_apontamento'
+    __table_args__ = {'extend_existing': True}
 
     # -------------------------------
     # 2) Colunas principais
@@ -38,7 +39,7 @@ class LocalApontamento(db.Model):
     chamados = db.relationship(
         'Chamado',
         backref='local_apontamento',
-        lazy=True
+        lazy='selectin'
     )
 
     # -------------------------------
