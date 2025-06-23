@@ -22,12 +22,12 @@ with app.app_context():
 
     # Insere dados iniciais apenas se não existirem
     def inserir_dados_iniciais():
-        from models.perfil import Perfil
-        from models.status_chamado import StatusChamado
-        from models.turno import Turno
-        from models.unidade import Unidade
-        from models.nao_conformidade import NaoConformidade
-        from models.local_apontamento import LocalApontamento
+        from src.models.perfil import Perfil
+        from src.models.status_chamado import StatusChamado
+        from src.models.turno import Turno
+        from src.models.unidade import Unidade
+        from src.models.nao_conformidade import NaoConformidade
+        from src.models.local_apontamento import LocalApontamento
         
         if not Perfil.query.first():
             perfis = [
@@ -97,6 +97,7 @@ with app.app_context():
             db.session.rollback()
             print(f"Erro ao inserir dados iniciais: {e}")
 
+    # Chama a função de inserção de dados
     inserir_dados_iniciais()
 
 @app.route('/static/<path:filename>')
