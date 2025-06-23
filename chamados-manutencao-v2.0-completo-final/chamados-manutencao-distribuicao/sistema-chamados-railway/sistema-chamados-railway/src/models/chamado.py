@@ -118,7 +118,7 @@ class Chamado(db.Model):
             'titulo': self.titulo,
             'descricao': self.descricao,
             'prioridade': self.prioridade,
-            'turno_nome': self.turno.nome if self.turno else None,  # Corrigido
+            'turno_nome': self.turno.nome if self.turno else None,
             'unidade_nome': self.unidade.nome if self.unidade else None,
             'nao_conformidade_nome': self.nao_conformidade.nome if self.nao_conformidade else None,
             'local_apontamento_nome': self.local_apontamento.nome if self.local_apontamento else None,
