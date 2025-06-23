@@ -1,136 +1,98 @@
+# src/main.py
 import os
 import sys
-from flask import Flask, send_from_directory, render_template
-from flask_migrate import Migrate, upgrade
+from flask_migrate import upgrade
+from src import create_app
 
-# Ajuste o sys.path para incluir o diretório pai de src
+# Ajuste o sys.path para incluir o diretório pai
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-# Imports relativos ao novo sys.path
-from models.user import db
-from routes.user import user_bp
-from routes.chamado import chamado_bp
-from config import Config
-
-app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-
-# Carrega configurações
-app.config.from_object(Config)
-Config.init_app(app)
-
-# Inicializa banco de dados e Migrate
-db.init_app(app)
-migrate = Migrate(app, db)
-
-# Registra blueprints
-app.register_blueprint(user_bp, url_prefix='/api')
-app.register_blueprint(chamado_bp)
-from routes.admin import admin_bp
-app.register_blueprint(admin_bp)
-
-def inserir_dados_iniciais():
-    """Insere dados iniciais necessários para o funcionamento do sistema"""
-    from models.perfil import Perfil
-    from models.status_chamado import StatusChamado
-    from models.turno import Turno
-    from models.unidade import Unidade
-    from models.nao_conformidade import NaoConformidade
-    from models.local_apontamento import LocalApontamento
-    
-    # Inserir perfis padrão
-    if not Perfil.query.first():
-        perfis = [
-            Perfil(nome='Administrador', descricao='Acesso total ao sistema'),
-            Perfil(nome='Manutenção', descricao='Técnicos de manutenção'),
-            Perfil(nome='Requisitante', descricao='Usuários que abrem chamados')
-        ]
-        for perfil in perfis:
-            db.session.add(perfil)
-    
-    # Inserir status padrão
-    if not StatusChamado.query.first():
-        status_list = [
-            StatusChamado(nome='Inicial', ordem=1),
-            StatusChamado(nome='Em aberto', ordem=2),
-            StatusChamado(nome='Em Andamento', ordem=3),
-            StatusChamado(nome='Aguardando Material de Reparo', ordem=4),
-            StatusChamado(nome='Concluído', ordem=5)
-        ]
-        for status in status_list:
-            db.session.add(status)
-    
-    # Inserir dados de exemplo para turnos (com descricao)
-    if not Turno.query.first():
-        turnos = [
-            Turno(nome='Manhã', descricao='8:00 às 12:00'),
-            Turno(nome='Tarde', descricao='13:00 às 17:00'),
-            Turno(nome='Noite', descricao='18:00 às 22:00'),
-            Turno(nome='Madrugada', descricao='23:00 às 7:00')
-        ]
-        for turno in turnos:
-            db.session.add(turno)
-    
-    # Inserir dados de exemplo para unidades
-    if not Unidade.query.first():
-        unidades = [
-            Unidade(nome='Unidade A'),
-            Unidade(nome='Unidade B'),
-            Unidade(nome='Unidade C')
-        ]
-        for unidade in unidades:
-            db.session.add(unidade)
-    
-    # Inserir dados de exemplo para não conformidades
-    if not NaoConformidade.query.first():
-        nao_conformidades = [
-            NaoConformidade(nome='Equipamento com defeito'),
-            NaoConformidade(nome='Vazamento'),
-            NaoConformidade(nome='Problema elétrico'),
-            NaoConformidade(nome='Limpeza necessária'),
-            NaoConformidade(nome='Manutenção preventiva')
-        ]
-        for nc in nao_conformidades:
-            db.session.add(nc)
-    
-    # Inserir dados de exemplo para locais de apontamento
-    if not LocalApontamento.query.first():
-        locais = [
-            LocalApontamento(nome='Área de Produção'),
-            LocalApontamento(nome='Escritório'),
-            LocalApontamento(nome='Almoxarifado'),
-            LocalApontamento(nome='Área Externa'),
-            LocalApontamento(nome='Banheiros')
-        ]
-        for local in locais:
-            db.session.add(local)
-    
-    try:
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(f"Erro ao inserir dados iniciais: {e}")
+app = create_app()
 
 with app.app_context():
-    # Importa todos os modelos
-    from models.chamado import Chamado
-    from models.turno import Turno
-    from models.unidade import Unidade
-    from models.nao_conformidade import NaoConformidade
-    from models.local_apontamento import LocalApontamento
-    from models.status_chamado import StatusChamado
-    from models.perfil import Perfil
-    from models.historico_chamado import HistoricoChamado
-    from models.contato_notificacao import ContatoNotificacaoManutencao
-    from models.historico_notificacoes import HistoricoNotificacoes
-    
     # Aplica migrações antes de inserir dados
     try:
         upgrade()  # Executa a migração mais recente
     except Exception as e:
         print(f"Erro ao aplicar migrações: {e}")
         raise  # Para depuração, falha se a migração falhar
+
+    # Insere dados iniciais (se desejar manter essa lógica aqui)
+    def inserir_dados_iniciais():
+        from models.perfil import Perfil
+        from models.status_chamado import StatusChamado
+        from models.turno import Turno
+        from models.unidade import Unidade
+        from models.nao_conformidade import NaoConformidade
+        from models.local_apontamento import LocalApontamento
+        
+        if not Perfil.query.first():
+            perfis = [
+                Perfil(nome='Administrador', descricao='Acesso total ao sistema'),
+                Perfil(nome='Manutenção', descricao='Técnicos de manutenção'),
+                Perfil(nome='Requisitante', descricao='Usuários que abrem chamados')
+            ]
+            for perfil in perfis:
+                db.session.add(perfil)
+        
+        if not StatusChamado.query.first():
+            status_list = [
+                StatusChamado(nome='Inicial', ordem=1),
+                StatusChamado(nome='Em aberto', ordem=2),
+                StatusChamado(nome='Em Andamento', ordem=3),
+                StatusChamado(nome='Aguardando Material de Reparo', ordem=4),
+                StatusChamado(nome='Concluído', ordem=5)
+            ]
+            for status in status_list:
+                db.session.add(status)
+        
+        if not Turno.query.first():
+            turnos = [
+                Turno(nome='Manhã', descricao='8:00 às 12:00'),
+                Turno(nome='Tarde', descricao='13:00 às 17:00'),
+                Turno(nome='Noite', descricao='18:00 às 22:00'),
+                Turno(nome='Madrugada', descricao='23:00 às 7:00')
+            ]
+            for turno in turnos:
+                db.session.add(turno)
+        
+        if not Unidade.query.first():
+            unidades = [
+                Unidade(nome='Unidade A'),
+                Unidade(nome='Unidade B'),
+                Unidade(nome='Unidade C')
+            ]
+            for unidade in unidades:
+                db.session.add(unidade)
+        
+        if not NaoConformidade.query.first():
+            nao_conformidades = [
+                NaoConformidade(nome='Equipamento com defeito'),
+                NaoConformidade(nome='Vazamento'),
+                NaoConformidade(nome='Problema elétrico'),
+                NaoConformidade(nome='Limpeza necessária'),
+                NaoConformidade(nome='Manutenção preventiva')
+            ]
+            for nc in nao_conformidades:
+                db.session.add(nc)
+        
+        if not LocalApontamento.query.first():
+            locais = [
+                LocalApontamento(nome='Área de Produção'),
+                LocalApontamento(nome='Escritório'),
+                LocalApontamento(nome='Almoxarifado'),
+                LocalApontamento(nome='Área Externa'),
+                LocalApontamento(nome='Banheiros')
+            ]
+            for local in locais:
+                db.session.add(local)
+        
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Erro ao inserir dados iniciais: {e}")
     
-    # Insere dados iniciais
     inserir_dados_iniciais()
 
 @app.route('/static/<path:filename>')

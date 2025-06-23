@@ -3,6 +3,7 @@
 # 1) IMPORTS E CONFIGURAÇÃO DO DB
 # ===============================
 from flask import Flask, redirect, url_for
+from flask_migrate import Migrate  # Adicionado para migrações
 from src.models import db
 from src.config import Config
 
@@ -23,6 +24,7 @@ def create_app():
 
     # Inicializa o SQLAlchemy com a instância importada de src.models
     db.init_app(app)
+    Migrate(app, db)  # Adicionado para gerenciar migrações
 
     # Importar modelos explicitamente
     from src.models.user import User
@@ -37,9 +39,9 @@ def create_app():
     from src.models.historico_notificacoes import HistoricoNotificacoes
     from src.models.local_apontamento import LocalApontamento
 
-    # Cria automaticamente as tabelas no banco ao subir a app
-    with app.app_context():
-        db.create_all()
+    # Remova db.create_all() para usar migrações
+    # with app.app_context():
+    #     db.create_all()
 
     # ===============================
     # 3) REGISTRO DOS BLUEPRINTS
