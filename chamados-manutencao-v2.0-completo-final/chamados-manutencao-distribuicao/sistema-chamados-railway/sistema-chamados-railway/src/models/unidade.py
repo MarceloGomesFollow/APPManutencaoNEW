@@ -26,7 +26,7 @@ class Unidade(db.Model):
     # -------------------------------
     # 3) Relacionamento com chamados
     # -------------------------------
-    chamados = db.relationship('Chamado', foreign_keys='Chamado.id_unidade', lazy=True, overlaps="unidade")  # Adicionado overlaps
+    chamados = db.relationship('Chamado', foreign_keys='Chamado.id_unidade', lazy=True, overlaps="unidade")
     
     # -------------------------------
     # 4) Métodos auxiliares

@@ -26,7 +26,7 @@ class Turno(db.Model):
     # -------------------------------
     # 3) Relacionamento com chamados
     # -------------------------------
-    chamados = db.relationship('Chamado', foreign_keys='Chamado.id_turno', lazy=True, overlaps="chamados_associados,turno")  # Adicionado overlaps
+    chamados = db.relationship('Chamado', foreign_keys='Chamado.id_turno', lazy=True, overlaps="chamados_associados,turno")
     
     # -------------------------------
     # 4) Métodos auxiliares
