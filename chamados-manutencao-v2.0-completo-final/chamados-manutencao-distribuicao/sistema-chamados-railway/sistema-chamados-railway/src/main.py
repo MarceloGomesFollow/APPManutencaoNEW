@@ -21,7 +21,7 @@ with app.app_context():
 
     # Insere dados iniciais apenas se não existirem
     def inserir_dados_iniciais():
-        from src.models import db  # Importa db dentro da função para evitar conflitos
+        from src.models import db  # Importa db dentro da função
         from src.models.perfil import Perfil
         from src.models.status_chamado import StatusChamado
         from src.models.turno import Turno
@@ -97,5 +97,5 @@ with app.app_context():
             db.session.rollback()
             print(f"Erro ao inserir dados iniciais: {e}")
 
-  # Chama a função de inserção de dados
-inserir_dados_iniciais() 
+    # Chama a função de inserção de dados dentro do contexto
+    inserir_dados_iniciais()
