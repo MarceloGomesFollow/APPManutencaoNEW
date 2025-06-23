@@ -1,8 +1,3 @@
-# src/models/turno.py
-# ===============================
-# Modelo de Turno
-# ===============================
-
 from . import db
 from datetime import datetime
 
@@ -19,6 +14,7 @@ class Turno(db.Model):
     # -------------------------------
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
+    descricao = db.Column(db.Text, nullable=True)  # Novo campo
     ativo = db.Column(db.Boolean, default=True, nullable=False)
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     data_atualizacao = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -36,6 +32,7 @@ class Turno(db.Model):
         return {
             'id': self.id,
             'nome': self.nome,
+            'descricao': self.descricao,  # Adicionado
             'ativo': self.ativo,
             'data_criacao': self.data_criacao.isoformat() if self.data_criacao else None,
             'data_atualizacao': self.data_atualizacao.isoformat() if self.data_atualizacao else None
