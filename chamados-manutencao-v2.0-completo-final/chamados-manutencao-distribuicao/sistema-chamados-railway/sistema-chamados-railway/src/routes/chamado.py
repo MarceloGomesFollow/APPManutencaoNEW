@@ -3,8 +3,6 @@ from flask import Blueprint, render_template, request, session, redirect, url_fo
 chamado_bp = Blueprint("chamado", __name__, url_prefix="/chamados")
 
 @chamado_bp.route("/", endpoint="index")
-def index():
-    return render_template("painel_chamados.html")
 
 @chamado_bp.route("/abrir", endpoint="abrir_chamado")
 def abrir_chamado():
