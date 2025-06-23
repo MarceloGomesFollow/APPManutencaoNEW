@@ -10,14 +10,12 @@ class Config:
     # -------------------------------
     # 1) Chave secreta
     # -------------------------------
-    # Usa variável de ambiente para maior segurança, com fallback para valor padrão
     SECRET_KEY = os.getenv('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
     
     # -------------------------------
     # 2) Banco de dados
     # -------------------------------
-    # Usa PostgreSQL via variável de ambiente DATABASE_URL fornecida pelo Railway, com fallback SQLite local
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///instance/app.db')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///' + os.path.join(os.path.dirname(__file__), '..', 'instance', 'app.db').replace('\\', '/'))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # -------------------------------
@@ -41,7 +39,6 @@ class Config:
     # -------------------------------
     # 5) Sessão
     # -------------------------------
-    # Expira após 1 hora, pode ser sobrescrito por SESSION_LIFETIME
     PERMANENT_SESSION_LIFETIME = timedelta(
         seconds=int(os.getenv('SESSION_LIFETIME', '3600'))
     )
@@ -49,5 +46,4 @@ class Config:
     @staticmethod
     def init_app(app):
         """Cria, se necessário, o diretório de uploads."""
-        # Cria pasta de uploads
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
