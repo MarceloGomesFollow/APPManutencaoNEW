@@ -1,5 +1,6 @@
+# src/routes/admin.py
 from flask import Blueprint, request, jsonify, render_template, flash, redirect, url_for
-from src.models.user import db
+from src.models.user import db 
 from src.models.turno import Turno
 from src.models.unidade import Unidade
 from src.models.nao_conformidade import NaoConformidade
@@ -296,8 +297,7 @@ def painel_admin():
             'total_contatos': total_contatos
         }
         
-        return render_template('admin/painel.html', estatisticas=estatisticas)
+        return render_template('admin/painel_admin.html', estatisticas=estatisticas)
     except Exception as e:
         flash(f'Erro ao carregar painel: {str(e)}', 'error')
-        return render_template('admin/painel)admin.html', estatisticas={})
-
+        return render_template('admin/painel_admin.html', estatisticas={})
