@@ -1,14 +1,14 @@
 # src/__init__.py
 
+# src/__init__.py
+
 # ===============================
-# 1) IMPORTS E INSTÂNCIA DO DB
+# 1) IMPORTS E CONFIGURAÇÃO DO DB
 # ===============================
 from flask import Flask, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
-
-# Cria a instância do SQLAlchemy — será inicializada em create_app()
-db = SQLAlchemy()
-
+# Importa a instância única de SQLAlchemy definida em src/models/__init__.py
+from src.models import db
+from src.config import Config
 
 # ===============================
 # 2) FACTORY DE APLICATIVO
@@ -22,15 +22,10 @@ def create_app():
     )
 
     # Carrega as configurações da classe Config
-    app.config.from_object('src.config.Config')
-    # Se houver init_app na Config, chame-a
-    try:
-        from src.config import Config
-        Config.init_app(app)
-    except ImportError:
-        pass
+    app.config.from_object(Config)
+    Config.init_app(app)
 
-    # Inicializa o SQLAlchemy
+    # Inicializa o SQLAlchemy com a instância importada de src.models
     db.init_app(app)
 
     # (Opcional) Cria automaticamente as tabelas no banco ao subir a app
@@ -43,24 +38,21 @@ def create_app():
 
     # 3.1) Rotas de autenticação (admin + supervisor)
     from src.routes.auth import admin_auth_bp
-    # Blueprint já definido em auth.py com url_prefix='/admin'
-    app.register_blueprint(admin_auth_bp)
+    app.register_blueprint(admin_auth_bp)  # /admin/login, /admin/logout, etc.
 
     # 3.2) CRUDs administrativos (turnos, unidades, etc.)
     from src.routes.admin import admin_bp
-    # Blueprint já definido com url_prefix='/admin'
-    app.register_blueprint(admin_bp)
+    app.register_blueprint(admin_bp)       # /admin/*
 
     # 3.3) Rotas de chamados (cliente e supervisor)
     from src.routes.chamado import chamado_bp
-    app.register_blueprint(chamado_bp, url_prefix='/chamados')
+    app.register_blueprint(chamado_bp, url_prefix='/chamados')  # /chamados/*
 
     # ===============================
-    # 4) ROTA RAIZ
+    # 4) ROTA RAIZ (redirect para chamados)
     # ===============================
     @app.route('/')
-    def index():
-        """Redireciona a raiz para a página de chamados."""
+    def root():
         return redirect(url_for('chamado.index'))
 
     return app
