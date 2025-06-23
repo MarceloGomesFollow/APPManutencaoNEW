@@ -3,7 +3,7 @@
 # ===============================
 # 1) IMPORTS E INSTÂNCIA DO DB
 # ===============================
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 # Cria a instância do SQLAlchemy — será inicializada em create_app()
@@ -21,12 +21,14 @@ def create_app():
         static_folder="static"
     )
 
-    # Carrega as configurações da sua classe Config (ex: SECRET_KEY, DATABASE_URL, etc.)
-    # Você pode definir uma classe em src/config.py:
-    #   class Config:
-    #       SECRET_KEY = os.getenv('SECRET_KEY')
-    #       SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    # Carrega as configurações da classe Config
     app.config.from_object('src.config.Config')
+    # Se houver init_app na Config, chame-a
+    try:
+        from src.config import Config
+        Config.init_app(app)
+    except ImportError:
+        pass
 
     # Inicializa o SQLAlchemy
     db.init_app(app)
@@ -46,12 +48,19 @@ def create_app():
 
     # 3.2) CRUDs administrativos (turnos, unidades, etc.)
     from src.routes.admin import admin_bp
-    # Caso admin_bp não tenha url_prefix, defina aqui:
-    # app.register_blueprint(admin_bp, url_prefix='/admin')
+    # Blueprint já definido com url_prefix='/admin'
     app.register_blueprint(admin_bp)
 
     # 3.3) Rotas de chamados (cliente e supervisor)
     from src.routes.chamado import chamado_bp
     app.register_blueprint(chamado_bp, url_prefix='/chamados')
+
+    # ===============================
+    # 4) ROTA RAIZ
+    # ===============================
+    @app.route('/')
+    def index():
+        """Redireciona a raiz para a página de chamados."""
+        return redirect(url_for('chamado.index'))
 
     return app
