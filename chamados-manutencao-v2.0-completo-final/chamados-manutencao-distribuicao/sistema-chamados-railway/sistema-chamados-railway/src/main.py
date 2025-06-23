@@ -2,11 +2,12 @@ import os
 import sys
 from flask_migrate import upgrade
 
-# Ajuste o sys.path para incluir o diretório pai relativo ao main.py
+# Ajuste o sys.path para incluir o diretório raiz do projeto
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-# Importa create_app do pacote src
-from . import create_app
+# Importa create_app de forma absoluta
+import src  # Adiciona src ao namespace
+create_app = src.create_app
 
 app = create_app()
 
@@ -65,44 +66,4 @@ with app.app_context():
             ]
             for unidade in unidades:
                 db.session.add(unidade)
-        
-        if not NaoConformidade.query.first():
-            nao_conformidades = [
-                NaoConformidade(nome='Equipamento com defeito'),
-                NaoConformidade(nome='Vazamento'),
-                NaoConformidade(nome='Problema elétrico'),
-                NaoConformidade(nome='Limpeza necessária'),
-                NaoConformidade(nome='Manutenção preventiva')
-            ]
-            for nc in nao_conformidades:
-                db.session.add(nc)
-        
-        if not LocalApontamento.query.first():
-            locais = [
-                LocalApontamento(nome='Área de Produção'),
-                LocalApontamento(nome='Escritório'),
-                LocalApontamento(nome='Almoxarifado'),
-                LocalApontamento(nome='Área Externa'),
-                LocalApontamento(nome='Banheiros')
-            ]
-            for local in locais:
-                db.session.add(local)
-        
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(f"Erro ao inserir dados iniciais: {e}")
-    
-    inserir_dados_iniciais()
-
-@app.route('/static/<path:filename>')
-def static_files(filename):
-    return send_from_directory(app.static_folder, filename)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+                
