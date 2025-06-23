@@ -3,7 +3,7 @@
 # 1) IMPORTS E CONFIGURAÇÃO DO DB
 # ===============================
 from flask import Flask, redirect, url_for
-from flask_migrate import Migrate  # Adicionado para migrações
+from flask_migrate import Migrate
 from src.models import db
 from src.config import Config
 
@@ -24,38 +24,31 @@ def create_app():
 
     # Inicializa o SQLAlchemy com a instância importada de src.models
     db.init_app(app)
-    Migrate(app, db)  # Adicionado para gerenciar migrações
+    Migrate(app, db)
 
-    # Importar modelos explicitamente
-    from src.models.user import User
-    from src.models.perfil import Perfil
-    from src.models.chamado import Chamado
-    from src.models.turno import Turno
-    from src.models.unidade import Unidade
-    from src.models.nao_conformidade import NaoConformidade
-    from src.models.status_chamado import StatusChamado
-    from src.models.contato_notificacao import ContatoNotificacaoManutencao
-    from src.models.historico_chamado import HistoricoChamado
-    from src.models.historico_notificacoes import HistoricoNotificacoes
-    from src.models.local_apontamento import LocalApontamento
-
-    # Remova db.create_all() para usar migrações
-    # with app.app_context():
-    #     db.create_all()
+    # Importar modelos apenas se necessário (evitar redefinição)
+    with app.app_context():
+        from src.models.user import User
+        from src.models.perfil import Perfil
+        from src.models.chamado import Chamado
+        from src.models.turno import Turno
+        from src.models.unidade import Unidade
+        from src.models.nao_conformidade import NaoConformidade
+        from src.models.status_chamado import StatusChamado
+        from src.models.contato_notificacao import ContatoNotificacaoManutencao
+        from src.models.historico_chamado import HistoricoChamado
+        from src.models.historico_notificacoes import HistoricoNotificacoes
+        from src.models.local_apontamento import LocalApontamento
 
     # ===============================
     # 3) REGISTRO DOS BLUEPRINTS
     # ===============================
-
-    # 3.1) Rotas de autenticação (admin + supervisor)
     from src.routes.auth import admin_auth_bp
     app.register_blueprint(admin_auth_bp)
 
-    # 3.2) CRUDs administrativos (turnos, unidades, etc.)
     from src.routes.admin import admin_bp
     app.register_blueprint(admin_bp)
 
-    # 3.3) Rotas de chamados (cliente e supervisor)
     from src.routes.chamado import chamado_bp
     app.register_blueprint(chamado_bp, url_prefix='/chamados')
 

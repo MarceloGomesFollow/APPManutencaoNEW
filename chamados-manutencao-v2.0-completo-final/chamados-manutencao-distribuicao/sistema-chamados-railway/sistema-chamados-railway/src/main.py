@@ -20,7 +20,8 @@ with app.app_context():
         raise  # Para depuração, falha se a migração falhar
 
     # Insere dados iniciais apenas se não existirem
-    def inserir_dados_iniciais(db):
+    def inserir_dados_iniciais():
+        from src.models import db  # Importa db dentro da função para evitar conflitos
         from src.models.perfil import Perfil
         from src.models.status_chamado import StatusChamado
         from src.models.turno import Turno
@@ -96,16 +97,5 @@ with app.app_context():
             db.session.rollback()
             print(f"Erro ao inserir dados iniciais: {e}")
 
-    # Chama a função de inserção de dados, passando o db
-    inserir_dados_iniciais(db)
-
-@app.route('/static/<path:filename>')
-def static_files(filename):
-    return send_from_directory(app.static_folder, filename)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+  # Chama a função de inserção de dados
+inserir_dados_iniciais() 
