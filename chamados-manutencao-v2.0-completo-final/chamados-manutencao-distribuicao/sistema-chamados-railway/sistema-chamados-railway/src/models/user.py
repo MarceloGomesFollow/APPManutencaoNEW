@@ -21,7 +21,7 @@ class User(db.Model):
     # 2) Relacionamentos
     # -------------------------------
     historico_chamados = db.relationship('HistoricoChamado', backref='criado_por', foreign_keys='HistoricoChamado.id_usuario', lazy=True)
-    historico_acoes = db.relationship('HistoricoChamado', backref='usuario', foreign_keys='HistoricoChamado.id_usuario', lazy=True, overlaps="criado_por,historico_chamados")
+    historico_acoes = db.relationship('HistoricoChamado', foreign_keys='HistoricoChamado.id_usuario', lazy=True, back_populates="usuario")
     
     # -------------------------------
     # 3) Métodos auxiliares
