@@ -16,8 +16,8 @@ class Config:
     # -------------------------------
     # 2) Banco de dados
     # -------------------------------
-    # Usa PostgreSQL via variável de ambiente DATABASE_URL fornecida pelo Railway
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    # Usa PostgreSQL via variável de ambiente DATABASE_URL fornecida pelo Railway, com fallback SQLite local
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///instance/app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # -------------------------------
