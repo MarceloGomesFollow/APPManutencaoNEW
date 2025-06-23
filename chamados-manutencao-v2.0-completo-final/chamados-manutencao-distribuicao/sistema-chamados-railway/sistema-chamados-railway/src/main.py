@@ -1,13 +1,11 @@
 import os
 import sys
 from flask_migrate import upgrade
+from src import create_app
+from src.models import db  # Importa db explicitamente
 
 # Ajuste o sys.path para incluir o diretório raiz do projeto
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-# Importa create_app de forma absoluta
-import src
-create_app = src.create_app
 
 app = create_app()
 
@@ -21,7 +19,7 @@ with app.app_context():
         raise  # Para depuração, falha se a migração falhar
 
     # Insere dados iniciais apenas se não existirem
-    def inserir_dados_iniciais():
+    def inserir_dados_iniciais(db):
         from src.models.perfil import Perfil
         from src.models.status_chamado import StatusChamado
         from src.models.turno import Turno
@@ -97,8 +95,8 @@ with app.app_context():
             db.session.rollback()
             print(f"Erro ao inserir dados iniciais: {e}")
 
-    # Chama a função de inserção de dados
-    inserir_dados_iniciais()
+    # Chama a função de inserção de dados, passando o db
+    inserir_dados_iniciais(db)
 
 @app.route('/static/<path:filename>')
 def static_files(filename):
