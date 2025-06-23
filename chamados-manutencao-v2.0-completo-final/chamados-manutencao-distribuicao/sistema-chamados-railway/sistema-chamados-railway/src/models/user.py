@@ -20,8 +20,20 @@ class User(db.Model):
     # -------------------------------
     # 2) Relacionamentos
     # -------------------------------
-    historico_chamados = db.relationship('HistoricoChamado', backref='criado_por', foreign_keys='HistoricoChamado.id_usuario', lazy=True)
-    historico_acoes = db.relationship('HistoricoChamado', foreign_keys='HistoricoChamado.id_usuario', lazy=True, back_populates="usuario")
+    historico_chamados = db.relationship(
+        'HistoricoChamado',
+        backref='criado_por',
+        foreign_keys='HistoricoChamado.id_usuario',
+        lazy=True,
+        overlaps="historico_acoes,criado_por"
+    )
+    historico_acoes = db.relationship(
+        'HistoricoChamado',
+        foreign_keys='HistoricoChamado.id_usuario',
+        lazy=True,
+        back_populates="usuario",
+        overlaps="historico_chamados,criado_por"
+    )
     
     # -------------------------------
     # 3) Métodos auxiliares

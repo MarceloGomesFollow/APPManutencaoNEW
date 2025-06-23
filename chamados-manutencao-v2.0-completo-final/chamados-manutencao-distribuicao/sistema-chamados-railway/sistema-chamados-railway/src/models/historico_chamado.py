@@ -32,7 +32,7 @@ class HistoricoChamado(db.Model):
     # -------------------------------
     # 4) Relacionamentos
     # -------------------------------
-    chamado = db.relationship('Chamado', backref='historico', foreign_keys=[id_chamado], lazy=True)
+    chamado = db.relationship('Chamado', foreign_keys=[id_chamado], lazy=True)
     usuario = db.relationship('User', foreign_keys=[id_usuario], lazy=True, back_populates="historico_acoes")
     
     # -------------------------------
