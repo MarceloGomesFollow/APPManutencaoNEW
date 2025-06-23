@@ -32,8 +32,8 @@ class HistoricoChamado(db.Model):
     # -------------------------------
     # 4) Relacionamentos
     # -------------------------------
-    chamado = db.relationship('Chamado', backref='historico', lazy=True)
-    usuario = db.relationship('User', backref='historico_acoes', lazy=True)
+    chamado = db.relationship('Chamado', backref='historico', foreign_keys=[id_chamado], lazy=True)
+    usuario = db.relationship('User', backref='historico_acoes', foreign_keys=[id_usuario], lazy=True, overlaps="criado_por,historico_chamados")
     
     # -------------------------------
     # 5) Métodos auxiliares

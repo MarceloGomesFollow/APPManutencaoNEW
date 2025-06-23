@@ -80,6 +80,7 @@ class Chamado(db.Model):
     nao_conformidade = db.relationship('NaoConformidade', foreign_keys=[id_nao_conformidade], lazy=True)
     local_apontamento = db.relationship('LocalApontamento', foreign_keys=[id_local_apontamento], lazy=True)
     status_chamado = db.relationship('StatusChamado', foreign_keys=[id_status], lazy=True)
+    historico = db.relationship('HistoricoChamado', foreign_keys=[id], lazy=True)  # Adicionado para consistência com backref em HistoricoChamado
 
     # -------------------------------
     # 10) Métodos auxiliares
@@ -129,7 +130,8 @@ class Chamado(db.Model):
             'data_solicitacao': self.data_solicitacao.isoformat(),
             'data_conclusao': (self.data_fechamento.isoformat() if self.data_fechamento else None),
             'data_criacao': self.data_criacao.isoformat(),
-            'data_atualizacao': self.data_atualizacao.isoformat()
+            'data_atualizacao': self.data_atualizacao.isoformat(),
+            'historico': [h.to_dict() for h in self.historico] if self.historico else []
         }
 
     def __repr__(self):
