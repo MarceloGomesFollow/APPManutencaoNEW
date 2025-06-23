@@ -3,7 +3,7 @@
 # Modelo de Chamado de Manutenção
 # ===============================
 
-from src.models import db
+from . import db
 from datetime import datetime
 
 class Chamado(db.Model):
@@ -75,7 +75,7 @@ class Chamado(db.Model):
     # -------------------------------
     # 9) Relacionamentos SQLAlchemy
     # -------------------------------
-    turno = db.relationship('Turno', backref='chamados', foreign_keys=[id_turno], lazy=True)
+    turno = db.relationship('Turno', backref='chamados_associados', foreign_keys=[id_turno], lazy=True)
     unidade = db.relationship('Unidade', backref='chamados', foreign_keys=[id_unidade], lazy=True)
     nao_conformidade = db.relationship('NaoConformidade', backref='chamados',
                                       foreign_keys=[id_nao_conformidade], lazy=True)
@@ -121,7 +121,7 @@ class Chamado(db.Model):
             'titulo': self.titulo,
             'descricao': self.descricao,
             'prioridade': self.prioridade,
-            'turno_nome': self.turno.nome if self.turno else None,
+            'turno_nome': self.turno.nome if self.turno.chamados_associados else None,
             'unidade_nome': self.unidade.nome if self.unidade else None,
             'nao_conformidade_nome': self.nao_conformidade.nome if self.nao_conformidade else None,
             'local_apontamento_nome': self.local_apontamento.nome if self.local_apontamento else None,
