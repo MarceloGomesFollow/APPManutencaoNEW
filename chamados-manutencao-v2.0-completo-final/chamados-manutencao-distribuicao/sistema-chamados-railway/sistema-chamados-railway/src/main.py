@@ -1,13 +1,13 @@
 import os
 import sys
-# DON'T CHANGE THIS !!!
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-from flask import Flask, send_from_directory, render_template # <-- render_template incluido
+from flask import Flask, send_from_directory, render_template
+from flask_migrate import Migrate
 from src.models.user import db
 from src.routes.user import user_bp
 from src.routes.chamado import chamado_bp
 from src.config import Config
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
@@ -15,16 +15,15 @@ app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'sta
 app.config.from_object(Config)
 Config.init_app(app)
 
+# Inicializa banco de dados e Migrate
+db.init_app(app)
+migrate = Migrate(app, db)
+
 # Registra blueprints
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(chamado_bp)
-
-# Registra blueprint de administração
 from src.routes.admin import admin_bp
 app.register_blueprint(admin_bp)
-
-# Inicializa banco de dados
-db.init_app(app)
 
 def inserir_dados_iniciais():
     """Insere dados iniciais necessários para o funcionamento do sistema"""
@@ -57,13 +56,13 @@ def inserir_dados_iniciais():
         for status in status_list:
             db.session.add(status)
     
-    # Inserir dados de exemplo para turnos
+    # Inserir dados de exemplo para turnos (com descricao)
     if not Turno.query.first():
         turnos = [
-            Turno(nome='Manhã'),
-            Turno(nome='Tarde'),
-            Turno(nome='Noite'),
-            Turno(nome='Madrugada')
+            Turno(nome='Manhã', descricao='8:00 às 12:00'),
+            Turno(nome='Tarde', descricao='13:00 às 17:00'),
+            Turno(nome='Noite', descricao='18:00 às 22:00'),
+            Turno(nome='Madrugada', descricao='23:00 às 7:00')
         ]
         for turno in turnos:
             db.session.add(turno)
@@ -121,18 +120,16 @@ with app.app_context():
     from src.models.contato_notificacao import ContatoNotificacaoManutencao
     from src.models.historico_notificacoes import HistoricoNotificacoes
     
-    # Cria todas as tabelas
-    db.create_all()
-    
     # Insere dados iniciais
     inserir_dados_iniciais()
 
 @app.route('/static/<path:filename>')
 def static_files(filename):
     return send_from_directory(app.static_folder, filename)
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
-
