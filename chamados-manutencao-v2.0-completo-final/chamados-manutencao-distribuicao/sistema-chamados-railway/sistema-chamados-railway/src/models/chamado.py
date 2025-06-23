@@ -76,14 +76,13 @@ class Chamado(db.Model):
     # 9) Relacionamentos SQLAlchemy
     # -------------------------------
     turno = db.relationship('Turno', backref='chamados_associados', foreign_keys=[id_turno], lazy=True)
-    unidade = db.relationship('Unidade', backref='chamados', foreign_keys=[id_unidade], lazy=True)
+    unidade = db.relationship('Unidade', foreign_keys=[id_unidade], lazy=True)  # Removido backref='chamados'
     nao_conformidade = db.relationship('NaoConformidade', backref='chamados',
                                       foreign_keys=[id_nao_conformidade], lazy=True)
     local_apontamento = db.relationship('LocalApontamento', backref='chamados',
                                         foreign_keys=[id_local_apontamento], lazy=True)
     status_chamado = db.relationship('StatusChamado', backref='chamados',
                                      foreign_keys=[id_status], lazy=True)
-
     # -------------------------------
     # 10) Métodos auxiliares
     # -------------------------------
