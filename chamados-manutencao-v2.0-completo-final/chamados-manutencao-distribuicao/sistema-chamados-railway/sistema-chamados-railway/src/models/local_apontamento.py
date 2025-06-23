@@ -3,7 +3,7 @@
 # Modelo de Local de Apontamento
 # ===============================
 
-from models import db  # import absoluto para instância SQLAlchemy
+from . import db  # import absoluto para instância SQLAlchemy
 from datetime import datetime
 
 class LocalApontamento(db.Model):
