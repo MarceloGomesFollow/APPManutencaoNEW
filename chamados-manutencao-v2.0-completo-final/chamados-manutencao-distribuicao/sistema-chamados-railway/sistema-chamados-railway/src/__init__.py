@@ -1,5 +1,4 @@
-# src/__init__.py
-from flask import Flask  # type: ignore
+from flask import Flask
 
 def create_app():
     app = Flask(
@@ -7,15 +6,18 @@ def create_app():
         template_folder="templates",
         static_folder="static"
     )
-    app.secret_key = "Luiza@1980@follow"  # em produção, use VAR de ambiente
+    app.config.from_object('src.config.Config')  # ou defina SECRET_KEY aqui
 
-    # importe e registre seus blueprints DENTRO do create_app
-    from src.routes.admin_auth import admin_auth
-    from src.admin          import admin_bp
+    # 1) Login/Logout de admin e supervisor (em src/routes/auth.py)
+    from src.routes.auth   import admin_auth_bp
+    # 2) Painel + CRUDs administrativos (em src/routes/admin.py)
+    from src.routes.admin  import admin_bp
+    # 3) Chamados (em src/routes/chamado.py)
     from src.routes.chamado import chamado_bp
 
-    app.register_blueprint(admin_auth)    # /admin/login
-    app.register_blueprint(admin_bp)      # /admin/…
-    app.register_blueprint(chamado_bp)    # /chamados/…
+    # Registre os blueprints **dentro** do create_app():
+    app.register_blueprint(admin_auth_bp)             # rotas: /admin-login, /supervisor-login
+    app.register_blueprint(admin_bp,    url_prefix='/admin')   # rotas: /admin/, /admin/turnos, etc.
+    app.register_blueprint(chamado_bp,  url_prefix='/chamados')# rotas: /chamados/…
 
     return app

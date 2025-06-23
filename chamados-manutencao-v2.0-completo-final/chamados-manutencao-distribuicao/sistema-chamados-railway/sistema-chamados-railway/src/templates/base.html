@@ -199,25 +199,26 @@
                 </ul>
                 
                 <ul class="navbar-nav">
-                    {% if session.supervisor %}
+                    {% if session.get('supervisor_logged_in') %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('chamado.painel_supervisor') }}">
-                                <i class="bi bi-shield-check"></i> Painel Supervisor
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('chamado.supervisor_logout') }}">
-                                <i class="bi bi-box-arrow-right"></i> Sair
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('chamado.supervisor_login') }}">
-                                <i class="bi bi-shield-lock"></i> Supervisor
-                            </a>
-                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('admin_auth.login') }}">
-                                 <i class="bi bi-shield-lock"></i> Administrador
+                     <a class="nav-link" href="{{ url_for('chamado.painel_supervisor') }}">
+                         <i class="bi bi-shield-check"></i> Painel Supervisor
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                         <a class="nav-link" href="{{ url_for('admin_auth.supervisor_logout') }}">
+                            <i class="bi bi-box-arrow-right"></i> Sair
+                        </a>
+                    </li>
+  {% else %}
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('admin_auth.supervisor_login') }}">
+        <i class="bi bi-shield-lock"></i> Supervisor
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('admin_auth.admin_login') }}">
+        <i class="bi bi-shield-lock"></i> Administrador
                             </a>
                         </li>
 
