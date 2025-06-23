@@ -63,7 +63,18 @@ def painel_admin():
 # 8) PAINEL SUPERVISOR
 @chamado_bp.route("/supervisor", endpoint="painel_supervisor")
 def painel_supervisor():
-    return render_template("painel_supervisor.html")
+    # Import dinâmico do modelo Chamado
+    from src.models.chamado import Chamado
+
+    # Conta o total de chamados no banco
+    total = Chamado.query.count()
+    estatisticas = {
+        'total_chamados': total,
+        # Adicione outras métricas, se necessário, ex.:
+        # 'abertos': Chamado.query.filter_by(status='aberto').count(),
+        # 'fechados': Chamado.query.filter_by(status='fechado').count(),
+    }
+    return render_template("painel_supervisor.html", estatisticas=estatisticas)
 
 # 9) LOGIN SUPERVISOR
 @chamado_bp.route("/login", endpoint="supervisor_login", methods=["GET", "POST"])
