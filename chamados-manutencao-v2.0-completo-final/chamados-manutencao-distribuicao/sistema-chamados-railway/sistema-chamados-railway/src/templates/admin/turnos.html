@@ -43,7 +43,7 @@ document.getElementById('formNovoTurno').addEventListener('submit', function (e)
 
     const nome = document.getElementById('nome').value;
 
-    fetch('/admin/turnos', {
+    fetch('/admin/turnos/api', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
