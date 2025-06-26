@@ -186,32 +186,42 @@
 </section>
 {% endblock %}
 
-{% block extra_js %}
+{{% block extra_js %}
 <script>
-// Carrega estatísticas via AJAX
+/* -------------------------------------------------------
+ * Bloco: Carregamento de estatísticas via AJAX (com validação)
+ * -------------------------------------------------------
+ */
 document.addEventListener('DOMContentLoaded', function() {
     fetch('/relatorio')
-        .then(response => response.text())
+        .then(response => {
+            // Proteção: só continua se a resposta for HTML válida
+            const contentType = response.headers.get("content-type") || "";
+            if (!response.ok || !contentType.includes("text/html")) {
+                throw new Error("Resposta inesperada (não é HTML).");
+            }
+            return response.text();
+        })
         .then(html => {
-            // Parse do HTML para extrair estatísticas
+            // Parseia o HTML retornado para extrair estatísticas
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            
-            // Tenta encontrar elementos com as estatísticas
+
+            // Seleciona os elementos contendo estatísticas
             const totalElement = doc.querySelector('[data-stat="total"]');
             const abertosElement = doc.querySelector('[data-stat="abertos"]');
             const andamentoElement = doc.querySelector('[data-stat="andamento"]');
             const concluidosElement = doc.querySelector('[data-stat="concluidos"]');
-            
-            // Atualiza os elementos se encontrados
+
+            // Atualiza a tela com os valores, se encontrados
             if (totalElement) document.getElementById('total-chamados').textContent = totalElement.textContent;
             if (abertosElement) document.getElementById('chamados-abertos').textContent = abertosElement.textContent;
             if (andamentoElement) document.getElementById('chamados-andamento').textContent = andamentoElement.textContent;
             if (concluidosElement) document.getElementById('chamados-concluidos').textContent = concluidosElement.textContent;
         })
         .catch(error => {
+            // Em caso de falha, exibe valores padrão e loga o erro
             console.log('Erro ao carregar estatísticas:', error);
-            // Define valores padrão em caso de erro
             document.getElementById('total-chamados').textContent = '0';
             document.getElementById('chamados-abertos').textContent = '0';
             document.getElementById('chamados-andamento').textContent = '0';
@@ -220,4 +230,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
-
