@@ -38,8 +38,9 @@
     </style>
 </head>
 <script>
-document.getElementById('formNovoTurno').addEventListener('submit', function (e) {
-    e.preventDefault();
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('formNovoTurno').addEventListener('submit', function (e) {
+      e.preventDefault();
 
     const nome = document.getElementById('nome').value;
 
