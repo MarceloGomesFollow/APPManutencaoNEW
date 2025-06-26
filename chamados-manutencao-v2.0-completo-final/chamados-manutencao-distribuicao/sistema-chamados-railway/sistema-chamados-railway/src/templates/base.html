@@ -29,8 +29,8 @@
             <a class="navbar-brand" href="{{ url_for('chamado.index') }}">
                 <i class="bi bi-tools"></i> Sistema de Chamados
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" title="Abrir menu de navegação">
+    <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <!-- Links principais (públicos) -->
@@ -97,7 +97,7 @@
                     <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
                         <i class="bi bi-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
                         {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" title="Fechar alerta"></button>
                     </div>
                 {% endfor %}
             </div>
