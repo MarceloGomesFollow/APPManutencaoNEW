@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Locais de Apontamento</title>
+</head>
+<body>
+  <h1>Locais de Apontamento</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Descrição</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for local in locais %}
+      <tr>
+        <td>{{ local.id }}</td>
+        <td>{{ local.nome }}</td>
+        <td>{{ local.descricao }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
