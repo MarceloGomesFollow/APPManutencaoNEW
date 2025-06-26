@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function desativarTurno(id) {
             if (confirm('Tem certeza que deseja desativar este turno?')) {
-                fetch(`/admin/turnos/${id}`, {
+                fetch(`/admin/turnos/api/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const nome = document.getElementById('editNome').value;
             const ativo = document.getElementById('editAtivo').checked;
             
-            fetch(`/admin/turnos/${id}`, {
+            fetch(`/admin/turnos/api/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
