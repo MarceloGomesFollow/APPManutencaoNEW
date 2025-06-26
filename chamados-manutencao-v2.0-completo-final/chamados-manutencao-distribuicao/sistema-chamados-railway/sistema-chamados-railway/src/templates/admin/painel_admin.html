@@ -773,7 +773,7 @@ document.addEventListener('DOMContentLoaded', function() {
         alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
         alertContainer.innerHTML = `
             ${mensagem}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" title="Fechar alerta"></button>
         `;
         
         document.body.appendChild(alertContainer);
