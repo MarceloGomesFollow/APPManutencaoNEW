@@ -318,7 +318,7 @@
                 <h5 class="modal-title">
                     <i class="bi bi-chat-dots"></i> Resposta Técnica
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" title="Fechar modal"></button>
             </div>
             <form id="formResposta">
                 <div class="modal-body">
@@ -366,7 +366,7 @@
                 <h5 class="modal-title">
                     <i class="bi bi-tools"></i> Registrar Ação Tomada
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" title="Fechar modal"></button>
             </div>
             <form id="formAcao">
                 <div class="modal-body">
@@ -617,7 +617,7 @@ function mostrarAlerta(mensagem, tipo) {
     alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
     alertContainer.innerHTML = `
         ${mensagem}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" title="Fechar alerta"></button>
     `;
     
     document.body.appendChild(alertContainer);
