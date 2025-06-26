@@ -34,23 +34,24 @@ def api_turnos():
 
 @admin_bp.route('/turnos', methods=['POST'])
 def criar_turno():
-    """Cria um novo turno"""
+    """Cria um novo turno via JSON"""
     try:
-        nome = request.form.get('nome')
+        data = request.get_json()
+        nome = data.get('nome')
+        descricao = data.get('descricao', '')
+        ativo = data.get('ativo', True)
+
         if not nome:
-            flash('Nome é obrigatório', 'error')
-            return redirect(url_for('admin.listar_turnos'))
-        
-        turno = Turno(nome=nome)
+            return jsonify({'error': 'Nome é obrigatório'}), 400
+
+        turno = Turno(nome=nome, descricao=descricao, ativo=ativo)
         db.session.add(turno)
         db.session.commit()
-        
-        flash('Turno criado com sucesso!', 'success')
-        return redirect(url_for('admin.listar_turnos'))
+
+        return jsonify({'mensagem': 'Turno criado com sucesso!', 'turno': turno.to_dict()}), 201
     except Exception as e:
         db.session.rollback()
-        flash(f'Erro ao criar turno: {str(e)}', 'error')
-        return redirect(url_for('admin.listar_turnos'))
+        return jsonify({'error': str(e)}), 500
 
 @admin_bp.route('/turnos/<int:id>', methods=['PUT'])
 def atualizar_turno(id):
