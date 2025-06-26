@@ -18,8 +18,7 @@ def listar_turnos():
     """Lista todos os turnos"""
     try:
         turnos = Turno.query.filter_by(ativo=True).all()
-        turnos_dict = [turno.to_dict() for turno in turnos]
-        return render_template('admin/turnos.html', turnos=turnos_dict)
+        return render_template('admin/turnos.html', turnos=turnos)
     except Exception as e:
         flash(f'Erro ao carregar turnos: {str(e)}', 'error')
         return render_template('admin/turnos.html', turnos=[])
