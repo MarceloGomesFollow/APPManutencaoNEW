@@ -37,6 +37,36 @@
         }
     </style>
 </head>
+<script>
+document.getElementById('formNovoTurno').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const nome = document.getElementById('nome').value;
+
+    fetch('/admin/turnos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            nome: nome,
+            ativo: true
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            alert('Turno criado com sucesso!');
+            location.reload();
+        } else {
+            alert('Erro ao criar turno: ' + (data.error || 'Erro desconhecido'));
+        }
+    })
+    .catch(error => {
+        alert('Erro na requisição: ' + error);
+    });
+});
+</script>
 <body>
     <div class="container py-4">
         <!-- Header -->
@@ -139,7 +169,7 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" action="/admin/turnos">
+                <form id="formNovoTurno">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="nome" class="form-label">Nome do Turno</label>
