@@ -64,3 +64,5 @@ def create_app():
     @app.route('/health', methods=['GET'])
     def health_check():
         return 'OK', 200
+    
+    return app
