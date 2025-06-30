@@ -1,14 +1,18 @@
 # src/routes/admin.py
 
 from flask import Blueprint, request, jsonify, render_template, flash, redirect, url_for
-from src.database import db  # import ajustado para o módulo correto
-from src.models.turno import Turno
-from src.models.unidade import Unidade
-from src.models.nao_conformidade import NaoConformidade
-from src.models.local_apontamento import LocalApontamento
-from src.models.status_chamado import StatusChamado 
-from src.models.perfil import Perfil
-from src.models.contato_notificacao import ContatoNotificacaoManutencao
+
+# Import do SQLAlchemy vindo do seu módulo database
+from database.db import db
+
+# Import dos modelos diretamente da pasta models
+from models.turno import Turno
+from models.unidade import Unidade
+from models.nao_conformidade import NaoConformidade
+from models.local_apontamento import LocalApontamento
+from models.status_chamado import StatusChamado
+from models.perfil import Perfil
+from models.contato_notificacao import ContatoNotificacaoManutencao
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
