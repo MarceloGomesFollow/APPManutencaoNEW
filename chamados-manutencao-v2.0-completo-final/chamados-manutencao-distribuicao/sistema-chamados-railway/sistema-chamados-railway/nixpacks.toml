@@ -1,14 +1,22 @@
+# nixpacks.toml
+
 [phases.setup]
-commands = []
+# nada a fazer na setup
 
 [phases.install]
-commands = ["pip install --no-cache-dir -r requirements.txt"]
+commands = [
+  # invoca o pip via python3
+  "python3 -m pip install --no-cache-dir -r requirements.txt"
+]
 
 [phases.build]
-commands = []  # aqui não executamos nada
+# não rodamos nada aqui (evita python main.py)
+commands = []
 
 [phases.start]
 commands = [
+  # faz migrate + seed
   "flask --app src.main db upgrade",
+  # sobe o Gunicorn
   "gunicorn --bind 0.0.0.0:$PORT --workers 4 --timeout 120 src.main:app"
 ]
