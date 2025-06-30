@@ -1,7 +1,7 @@
 # src/routes/admin.py
 from flask import Blueprint, request, jsonify, render_template, flash, redirect, url_for
-from src.models.user import db 
-from src.models.turno import Turno
+from src.models import db
+from .models.turno import Turno
 from src.models.unidade import Unidade
 from src.models.nao_conformidade import NaoConformidade
 from src.models.local_apontamento import LocalApontamento
