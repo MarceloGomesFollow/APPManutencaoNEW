@@ -1,9 +1,16 @@
 # wsgi.py
+"""
+Ponto de entrada WSGI para produção.
+Use este arquivo para rodar Gunicorn, uWSGI, etc:
+    gunicorn wsgi:app
+ou
+    gunicorn src.main:app
+"""
 
 import os
 import sys
 
-# Insere o diretório 'src/' no início do path de módulos
+# Adiciona o diretório 'src/' ao sys.path para facilitar imports absolutos
 sys.path.insert(
     0,
     os.path.abspath(
