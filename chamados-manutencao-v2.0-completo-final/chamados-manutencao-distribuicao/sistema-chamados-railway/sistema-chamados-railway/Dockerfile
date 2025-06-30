@@ -1,29 +1,30 @@
 # Dockerfile otimizado para Railway
+
 FROM python:3.11-slim
 
+# 1. Definir diretório de trabalho
 WORKDIR /app
 
-# Dependências de SO necessárias (compiladores)
-RUN apt-get update && apt-get install -y \
-    gcc g++ \
-  && rm -rf /var/lib/apt/lists/*
+# 2. Instalar dependências de SO (compiladores)
+RUN apt-get update \
+ && apt-get install -y gcc g++ \
+ && rm -rf /var/lib/apt/lists/*
 
-# Instala as libs Python
+# 3. Copiar e instalar dependências Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia o código
+# 4. Copiar todo o código da aplicação
 COPY . .
 
-# Cria pastas utilizadas pela app
+# 5. Criar pastas que sua app usa em runtime
 RUN mkdir -p instance uploads logs backups
 
-# Define o PYTHONPATH para que imports src.* funcionem
+# 6. Ajustar PYTHONPATH para que imports "src.*" funcionem
 ENV PYTHONPATH=/app
 
-# Expõe a porta fixa que o Railway usará
+# 7. Expor a porta que o Gunicorn vai usar
 EXPOSE 8080
 
-# No runtime, o Railway usará seu Procfile para a fase de release,
-# e este CMD apenas inicia o Gunicorn para servir o app:
+# 8. Comando padrão: só sobe o servidor HTTP
 CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120", "src.main:app"]
