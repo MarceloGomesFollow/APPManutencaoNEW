@@ -25,7 +25,7 @@ RUN mkdir -p instance uploads logs backups
 ENV PYTHONPATH=/app
 
 # 8) Expor a porta padrão (só documentação, não define variável)
-EXPOSE 8080
+EXPOSE 5000
 
 # 9) Comando final: **shell form**, para que o $PORT seja expandido  
 #    sem travar em literal “$PORT”.  
