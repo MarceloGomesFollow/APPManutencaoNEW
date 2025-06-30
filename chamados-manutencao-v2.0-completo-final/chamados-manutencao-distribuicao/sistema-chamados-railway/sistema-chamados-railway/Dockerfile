@@ -2,33 +2,29 @@
 
 FROM python:3.11-slim
 
-# 1. Definir diretório de trabalho
+# 1) Diretório de trabalho
 WORKDIR /app
 
-# 2. Instalar dependências do SO (compiladores)
+# 2) Dependências do SO (compiladores)
 RUN apt-get update \
  && apt-get install -y gcc g++ \
  && rm -rf /var/lib/apt/lists/*
 
-# 3. Copiar e instalar dependências Python
+# 3) Instalação de dependências Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 4. Copiar todo o código da aplicação
+# 4) Copia todo o código
 COPY . .
 
-# 5. Criar pastas usadas em runtime
+# 5) Cria pastas usadas em runtime
 RUN mkdir -p instance uploads logs backups
 
-# 6. Ajustar PYTHONPATH para imports “src.*”
+# 6) Ajusta PYTHONPATH para “src.*” funcionar
 ENV PYTHONPATH=/app
 
-# 7. Expor a porta fixa que o Gunicorn usa
+# 7) Expõe porta fixa que o Gunicorn usará
 EXPOSE 8080
 
-# 8. Parâmetros Gunicorn podem ser ajustados via variáveis de ambiente:
-#    GUNICORN_WORKERS (padrão: 2), GUNICORN_TIMEOUT (padrão: 120)
-ENV GUNICORN_WORKERS=2
-ENV GUNICORN_TIMEOUT=120
-
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:8080 --workers ${GUNICORN_WORKERS} --timeout ${GUNICORN_TIMEOUT} src.main:app"]
+# 8) Somente inicia o servidor WSGI
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120", "src.main:app"]
