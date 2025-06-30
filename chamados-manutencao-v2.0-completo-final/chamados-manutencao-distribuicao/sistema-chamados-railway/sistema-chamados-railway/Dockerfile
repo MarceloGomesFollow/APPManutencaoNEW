@@ -9,4 +9,5 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "python -c 'import os; print(os.environ.get(\"PORT\"))'"]
+CMD sh -c "gunicorn --bind 0.0.0.0:$PORT --workers 4 --timeout 120 src.main:app"
+
