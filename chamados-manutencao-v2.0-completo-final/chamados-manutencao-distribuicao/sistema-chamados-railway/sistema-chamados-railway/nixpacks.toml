@@ -1,20 +1,16 @@
 # nixpacks.toml
 
-# Não precisamos fazer nada na fase de setup
 [phases.setup]
 commands = []
 
-# Instalação de dependências usando o python “puro”
 [phases.install]
 commands = [
   "python -m pip install --no-cache-dir -r requirements.txt"
 ]
 
-# Build: não rodamos nada (evita o python main.py)
 [phases.build]
 commands = []
 
-# Start: aplica migrations/seed e sobe o Gunicorn
 [phases.start]
 commands = [
   "flask --app src.main db upgrade",
