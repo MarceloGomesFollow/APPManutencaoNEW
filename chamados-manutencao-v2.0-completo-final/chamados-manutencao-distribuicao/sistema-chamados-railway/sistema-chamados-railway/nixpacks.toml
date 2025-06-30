@@ -1,0 +1,14 @@
+[phases.setup]
+commands = []
+
+[phases.install]
+commands = ["pip install --no-cache-dir -r requirements.txt"]
+
+[phases.build]
+commands = []  # aqui não executamos nada
+
+[phases.start]
+commands = [
+  "flask --app src.main db upgrade",
+  "gunicorn --bind 0.0.0.0:$PORT --workers 4 --timeout 120 src.main:app"
+]
