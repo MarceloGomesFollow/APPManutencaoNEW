@@ -27,7 +27,6 @@ ENV PYTHONPATH=/app
 # 8) Expor a porta padrão (só documentação, não define variável)
 EXPOSE 5000
 
-# 9) Usar um entrypoint script para garantir o correto tratamento de sinais e expansão de variáveis
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+# 9) Comando final: **shell form**, para que o $PORT seja expandido  
+#    sem travar em literal “$PORT”.  
+CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 4 --timeout 120 src.main:app
