@@ -1,4 +1,4 @@
-# Dockerfile (coloque este no ROOT do seu repo, renomeando/removendo qualquer outro Dockerfile)
+# Dockerfile 
 
 # 1) Imagem base leve
 FROM python:3.11-slim

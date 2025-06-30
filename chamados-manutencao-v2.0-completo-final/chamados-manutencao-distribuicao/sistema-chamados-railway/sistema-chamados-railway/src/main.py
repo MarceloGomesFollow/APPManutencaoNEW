@@ -11,13 +11,15 @@ import os
 import sys
 from flask_migrate import upgrade
 
-# Se você for chamar com `python src/main.py`, garante que o projeto raiz esteja no PYTHONPATH
+# ====== PYTHONPATH para execução direta ======
+# Se rodar com `python src/main.py`, garante que o projeto raiz esteja no PYTHONPATH
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-# Importa a factory de app
-from src import create_app  # :contentReference[oaicite:0]{index=0}
+# ====== Importação da Factory e DB ======
+from src import create_app  # importa a função de criação do app Flask
 from src.models import db   # importa a instância de SQLAlchemy
 
+# ====== Função para inserir dados iniciais ======
 def inserir_dados_iniciais():
     """Insere perfis, status, turnos, unidades, não conformidades e locais de apontamento"""
     from src.models.perfil import Perfil
@@ -96,6 +98,7 @@ def inserir_dados_iniciais():
         db.session.rollback()
         print(f"Erro ao inserir dados iniciais: {e}")
 
+# ====== Função principal para rodar via linha de comando ======
 def main():
     """Entry-point do script de release"""
     app = create_app()
@@ -111,5 +114,11 @@ def main():
         # === SEED DE DADOS ===
         inserir_dados_iniciais()
 
+# ====== Execução direta pelo terminal ======
 if __name__ == "__main__":
     main()
+
+# ====== Exposição do app para Railway/Gunicorn (padrão WSGI) ======
+# ATENÇÃO: Esse bloco NÃO roda nada, só expõe a variável para servidores WSGI.
+from src import create_app
+app = create_app()
