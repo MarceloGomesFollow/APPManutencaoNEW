@@ -1,6 +1,7 @@
 # src/routes/admin.py
+
 from flask import Blueprint, request, jsonify, render_template, flash, redirect, url_for
-from src.models.db import db
+from src.database import db  # import ajustado para o módulo correto
 from src.models.turno import Turno
 from src.models.unidade import Unidade
 from src.models.nao_conformidade import NaoConformidade
@@ -280,7 +281,6 @@ def criar_contato_notificacao():
 def painel_admin():
     """Painel principal de administração"""
     try:
-        # Estatísticas básicas
         total_turnos = Turno.query.filter_by(ativo=True).count()
         total_unidades = Unidade.query.filter_by(ativo=True).count()
         total_ncs = NaoConformidade.query.filter_by(ativo=True).count()
