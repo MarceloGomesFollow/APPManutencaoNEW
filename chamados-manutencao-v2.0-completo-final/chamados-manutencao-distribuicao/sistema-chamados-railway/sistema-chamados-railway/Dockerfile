@@ -28,4 +28,4 @@ ENV PYTHONPATH=/app
 EXPOSE 8080
 
 # 9) Comando final: apenas inicia o Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "4", "--timeout", "120", "src.main:app"]
+CMD gunicorn --bind 0.0.0.0:$PORT --workers 4 --timeout 120 src.main:app
