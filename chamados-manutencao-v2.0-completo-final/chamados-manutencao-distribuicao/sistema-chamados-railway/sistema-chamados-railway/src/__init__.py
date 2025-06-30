@@ -58,5 +58,9 @@ def create_app():
     @app.route('/')
     def root():
         return redirect(url_for('chamado.index'))
-
-    return app
+    # ===============================
+    # 5) HEALTHCHECK (200 OK puro)
+    # ===============================
+    @app.route('/health', methods=['GET'])
+    def health_check():
+        return 'OK', 200
