@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Status de Chamados</title>
+</head>
+<body>
+    <h1>Status de Chamados</h1>
+    <ul>
+    {% if status_list %}
+        {% for status in status_list %}
+            <li>{{ status }}</li>
+        {% endfor %}
+    {% else %}
+        <li>Nenhum status encontrado.</li>
+    {% endif %}
+    </ul>
+</body>
+</html>
