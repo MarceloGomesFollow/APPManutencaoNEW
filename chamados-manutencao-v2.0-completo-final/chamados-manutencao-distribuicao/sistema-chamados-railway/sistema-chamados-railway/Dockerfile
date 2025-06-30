@@ -1,4 +1,5 @@
 # Dockerfile otimizado para Railway
+
 FROM python:3.11-slim
 
 # 1. Definir diretório de trabalho
@@ -25,6 +26,9 @@ ENV PYTHONPATH=/app
 # 7. Expor a porta fixa que o Gunicorn usa
 EXPOSE 8080
 
-# 8. Comando padrão: apenas sobe o Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120", "src.main:app"]
+# 8. Parâmetros Gunicorn podem ser ajustados via variáveis de ambiente:
+#    GUNICORN_WORKERS (padrão: 2), GUNICORN_TIMEOUT (padrão: 120)
+ENV GUNICORN_WORKERS=2
+ENV GUNICORN_TIMEOUT=120
 
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:8080 --workers ${GUNICORN_WORKERS} --timeout ${GUNICORN_TIMEOUT} src.main:app"]
