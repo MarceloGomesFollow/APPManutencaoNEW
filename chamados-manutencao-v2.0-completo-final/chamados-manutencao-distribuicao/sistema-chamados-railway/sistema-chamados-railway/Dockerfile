@@ -29,4 +29,5 @@ EXPOSE 5000
 
 # 9) Comando final: **shell form**, para que o $PORT seja expandido  
 #    sem travar em literal “$PORT”.  
-CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 4 --timeout 120 src.main:app
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT --workers 4 --timeout 120 src.main:app"]
+
