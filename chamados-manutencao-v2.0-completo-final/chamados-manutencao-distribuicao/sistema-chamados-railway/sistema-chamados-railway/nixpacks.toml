@@ -1,18 +1,12 @@
 # nixpacks.toml
 
 [phases.setup]
-commands = []
+nixPkgs = ["python311", "git"]
 
 [phases.install]
 commands = [
-  "python -m pip install --no-cache-dir -r requirements.txt"
+  "pip install --no-cache-dir -r requirements.txt"
 ]
 
-[phases.build]
-commands = []
-
-[phases.start]
-commands = [
-  "gunicorn src.main:app --bind 0.0.0.0:$PORT --workers 4 --timeout 120"
-]
-
+[start]
+cmd = "gunicorn src.main:app --bind 0.0.0.0:$PORT --workers 4 --timeout 120"
