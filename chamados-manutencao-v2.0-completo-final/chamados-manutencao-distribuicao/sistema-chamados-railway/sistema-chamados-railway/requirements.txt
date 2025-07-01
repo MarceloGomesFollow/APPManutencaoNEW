@@ -19,6 +19,4 @@ Flask-Mail==0.9.1
 Pillow==10.1.0
 python-dateutil==2.8.2
 Flask-Migrate==4.0.7
-# Ignorar qualquer Dockerfile no contexto
-Dockerfile
-**/Dockerfile
+
