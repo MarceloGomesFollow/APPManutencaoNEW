@@ -1,3 +1,6 @@
+[build]
+  # Esse bloco ativa os comandos personalizados abaixo
+
 [phases.install]
 commands = [
   "pip install --no-cache-dir -r requirements.txt"
