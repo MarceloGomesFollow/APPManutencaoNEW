@@ -12,16 +12,14 @@ import sys
 from flask_migrate import upgrade
 
 # ====== PYTHONPATH para execução direta ======
-# Se rodar com `python src/main.py`, garante que o projeto raiz esteja no PYTHONPATH
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # ====== Importação da Factory e DB ======
-from src import create_app  # importa a função de criação do app Flask
-from src.models import db   # importa a instância de SQLAlchemy
+from src import create_app
+from src.models import db
 
 # ====== Função para inserir dados iniciais ======
 def inserir_dados_iniciais():
-    """Insere perfis, status, turnos, unidades, não conformidades e locais de apontamento"""
     from src.models.perfil import Perfil
     from src.models.status_chamado import StatusChamado
     from src.models.turno import Turno
@@ -29,7 +27,6 @@ def inserir_dados_iniciais():
     from src.models.nao_conformidade import NaoConformidade
     from src.models.local_apontamento import LocalApontamento
 
-    # === PERFIS ===
     if not Perfil.query.first():
         perfis = [
             Perfil(nome='Administrador', descricao='Acesso total ao sistema'),
@@ -38,7 +35,6 @@ def inserir_dados_iniciais():
         ]
         db.session.bulk_save_objects(perfis)
 
-    # === STATUS DE CHAMADO ===
     if not StatusChamado.query.first():
         status_list = [
             StatusChamado(nome='Inicial', ordem=1),
@@ -49,7 +45,6 @@ def inserir_dados_iniciais():
         ]
         db.session.bulk_save_objects(status_list)
 
-    # === TURNOS ===
     if not Turno.query.first():
         turnos = [
             Turno(nome='Manhã', descricao='8:00 às 12:00'),
@@ -59,7 +54,6 @@ def inserir_dados_iniciais():
         ]
         db.session.bulk_save_objects(turnos)
 
-    # === UNIDADES ===
     if not Unidade.query.first():
         unidades = [
             Unidade(nome='Unidade A'),
@@ -68,7 +62,6 @@ def inserir_dados_iniciais():
         ]
         db.session.bulk_save_objects(unidades)
 
-    # === NÃO CONFORMIDADES ===
     if not NaoConformidade.query.first():
         nao_conformidades = [
             NaoConformidade(nome='Equipamento com defeito'),
@@ -79,7 +72,6 @@ def inserir_dados_iniciais():
         ]
         db.session.bulk_save_objects(nao_conformidades)
 
-    # === LOCAIS DE APONTAMENTO ===
     if not LocalApontamento.query.first():
         locais = [
             LocalApontamento(nome='Área de Produção'),
@@ -90,7 +82,6 @@ def inserir_dados_iniciais():
         ]
         db.session.bulk_save_objects(locais)
 
-    # Confirma as mudanças
     try:
         db.session.commit()
         print("Dados iniciais inseridos com sucesso")
@@ -98,28 +89,23 @@ def inserir_dados_iniciais():
         db.session.rollback()
         print(f"Erro ao inserir dados iniciais: {e}")
 
-# ====== Função principal para rodar via linha de comando ======
+# ====== Função principal para rodar via terminal ======
 def main():
-    """Entry-point do script de release"""
     app = create_app()
     with app.app_context():
-        upgrade()
-        # === MIGRAÇÕES ===
         try:
-            upgrade()  # aplica todas as migrations pendentes
+            upgrade()
             print("Migrações aplicadas com sucesso")
         except Exception as e:
             print(f"Erro ao aplicar migrações: {e}")
             sys.exit(1)
 
-        # === SEED DE DADOS ===
         inserir_dados_iniciais()
 
 # ====== Execução direta pelo terminal ======
 if __name__ == "__main__":
     main()
 
-# ====== Exposição do app para Railway/Gunicorn (padrão WSGI) ======
-# ATENÇÃO: Esse bloco NÃO roda nada, só expõe a variável para servidores WSGI.
+# ====== Exposição do app para servidores WSGI ======
 from src import create_app
 app = create_app()
