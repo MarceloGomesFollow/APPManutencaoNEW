@@ -1,11 +1,11 @@
 [build]
 
 [phases.setup]
-nixPkgs = ["python3", "python3Full", "python3Packages.pip", "gcc", "postgresql_16.dev"]
+nixPkgs = ["python3", "postgresql_16.dev", "gcc"]
 
 [phases.install]
 commands = [
-  "python3 -m ensurepip --upgrade",
+  "python3 -m pip install --upgrade pip",
   "pip install --no-cache-dir -r requirements.txt"
 ]
 
