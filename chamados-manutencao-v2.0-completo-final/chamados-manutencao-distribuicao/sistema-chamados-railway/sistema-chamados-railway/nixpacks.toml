@@ -13,5 +13,13 @@ commands = []
 
 [phases.start]
 commands = [
+  # 1) Aplica todas as migrations pendentes
+  "python -m flask --app src.main db upgrade",
+
+  # 2) Insere dados iniciais (opcional, se você tiver seed)
+  "python -m src.main",
+
+  # 3) Inicia o servidor
   "gunicorn src.main:app --bind 0.0.0.0:$PORT --workers 4 --timeout 120"
 ]
+
