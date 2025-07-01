@@ -103,6 +103,7 @@ def main():
     """Entry-point do script de release"""
     app = create_app()
     with app.app_context():
+        upgrade()
         # === MIGRAÇÕES ===
         try:
             upgrade()  # aplica todas as migrations pendentes
