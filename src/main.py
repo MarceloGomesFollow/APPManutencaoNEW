@@ -10,6 +10,7 @@ Execute via: python -m src.main   (ou `python src/main.py` se preferir)
 import os
 import sys
 from flask_migrate import upgrade
+from flask import render_template
 
 # ====== PYTHONPATH para execução direta ======
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -109,3 +110,8 @@ if __name__ == "__main__":
 # ====== Exposição do app para servidores WSGI ======
 from src import create_app
 app = create_app()
+
+# ====== Rota para relatório ======
+@app.route('/relatorio')
+def relatorio():
+    return render_template('relatorio.html')
