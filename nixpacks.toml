@@ -1,12 +1,14 @@
 [build]
 
 [phases.setup]
-nixPkgs = ["python3", "python3Packages.pip", "postgresql_16.dev", "gcc"]
+nixPkgs = ["python3", "python3Packages.virtualenv", "gcc", "postgresql_16.dev"]
 
 [phases.install]
 commands = [
-  "pip install --no-cache-dir -r requirements.txt"
+  "python3 -m venv /app/venv",
+  "/app/venv/bin/pip install --upgrade pip",
+  "/app/venv/bin/pip install --no-cache-dir -r requirements.txt"
 ]
 
 [start]
-cmd = "gunicorn src.main:app --bind 0.0.0.0:$PORT --workers 4 --timeout 120"
+cmd = "/app/venv/bin/gunicorn src.main:app --bind 0.0.0.0:$PORT --workers 4 --timeout 120"
