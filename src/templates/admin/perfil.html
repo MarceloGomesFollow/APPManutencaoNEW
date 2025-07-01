@@ -1,0 +1,33 @@
+<!-- perfis.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Perfis Cadastrados</title>
+</head>
+<body>
+    <h1>Perfis Cadastrados</h1>
+    <ul>
+        {% for perfil in perfis %}
+            <li>{{ perfil.nome }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Perfis Cadastrados</h1>
+    <ul>
+        {% for perfil in perfis %}
+            <li>{{ perfil.nome }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+{% block scripts %}
+    <script>
+        // Aqui você pode adicionar scripts específicos para esta página, se necessário
+    </script>
+{% endblock %}
+{% block styles %}
+    <style>
+        /* Aqui você pode adicionar estilos específicos para esta página, se necessário *
