@@ -11,4 +11,4 @@ commands = [
 ]
 
 [start]
-cmd = "/tmp/venv/bin/bash -c 'mkdir -p instance && /tmp/venv/bin/flask --app src.main db upgrade && /tmp/venv/bin/gunicorn src.main:app --bind 0.0.0.0:$PORT --workers 4 --timeout 120'"
+cmd = "/tmp/venv/bin/bash -c 'mkdir -p instance && /tmp/venv/bin/flask --app src.main db upgrade && /tmp/venv/bin/python -m gunicorn src.main:app --bind 0.0.0.0:$PORT --workers 4 --timeout 120'"
