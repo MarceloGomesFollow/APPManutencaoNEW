@@ -1,17 +1,30 @@
 # nixpacks.toml
 
+# Não precisamos de nenhum comando de setup
 [phases.setup]
 commands = []
 
+# Instala as dependências Python (inclui Flask, Flask-Migrate, Gunicorn etc)
 [phases.install]
 commands = [
   "python -m pip install --no-cache-dir -r requirements.txt"
 ]
 
+# Nenhum passo de build adicional
 [phases.build]
 commands = []
 
+# Na fase de start, aplica migrações/seed e sobe o Gunicorn
 [phases.start]
 commands = [
+  # 1) Migrações via Flask-Migrate
+  "python -m flask --app src.main db upgrade",
+
+  # 2) Seed de dados iniciais (chama sua função de seed)
+  "python -c 'import src.main; src.main.inserir_dados_iniciais()'",
+
+  # 3) Inicia o servidor Gunicorn na porta $PORT
   "gunicorn src.main:app --bind 0.0.0.0:$PORT --workers 4 --timeout 120"
+]
+
 ]
