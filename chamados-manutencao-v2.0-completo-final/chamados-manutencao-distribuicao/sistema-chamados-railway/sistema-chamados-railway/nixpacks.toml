@@ -12,12 +12,7 @@ commands = [
 commands = []
 
 [phases.start]
-# 1) Aplica migrações via Flask-Migrate
-# 2) Insere dados iniciais (seed)
-# 3) Inicia o Gunicorn
 commands = [
-  "python -m flask --app src.main db upgrade",
-  "python -c 'import src.main; src.main.inserir_dados_iniciais()'",
   "gunicorn src.main:app --bind 0.0.0.0:$PORT --workers 4 --timeout 120"
 ]
 
