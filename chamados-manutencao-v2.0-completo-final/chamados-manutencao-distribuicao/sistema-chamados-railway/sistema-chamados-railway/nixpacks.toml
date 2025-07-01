@@ -13,6 +13,5 @@ commands = []
 
 [phases.start]
 commands = [
-  "flask --app src.main db upgrade",
-  "gunicorn --bind 0.0.0.0:$PORT --workers 4 --timeout 120 src.main:app"
+  "gunicorn src.main:app --bind 0.0.0.0:$PORT --workers 4 --timeout 120"
 ]
