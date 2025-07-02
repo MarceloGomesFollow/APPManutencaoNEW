@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for
-
+from src.services.chamado_service import ChamadoService
 from src.models import LocalApontamento, Turno, Unidade, NaoConformidade
 
 # 1) Importa o modelo para usar no relatório (será carregado dentro das funções após init_app)
