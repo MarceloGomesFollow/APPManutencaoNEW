@@ -47,11 +47,11 @@ def criar_turno():
         turno = Turno(nome=nome, descricao=descricao, ativo=ativo)
         db.session.add(turno)
         db.session.commit()
-        return jsonify({'mensagem': 'Turno criado com sucesso!', 'turno': turno.to_dict()}), 201
+        return jsonify({'success': True, 'message': 'Turno criado com sucesso!', 'turno': turno.to_dict()}), 201
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @admin_bp.route('/turnos/<int:id>', methods=['PUT'])
 def atualizar_turno(id):
@@ -62,11 +62,12 @@ def atualizar_turno(id):
         turno.nome = data.get('nome', turno.nome)
         turno.ativo = data.get('ativo', turno.ativo)
         db.session.commit()
-        return jsonify({'success': True, 'mensagem': 'Turno atualizado com sucesso!', 'turno': turno.to_dict()})
+        return jsonify({'success': True, 'message': 'Turno atualizado com sucesso!', 'turno': turno.to_dict()}), 200
+
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @admin_bp.route('/turnos/<int:id>', methods=['DELETE'])
 def deletar_turno(id):
@@ -75,11 +76,11 @@ def deletar_turno(id):
         turno = Turno.query.get_or_404(id)
         turno.ativo = False
         db.session.commit()
-        return jsonify({'success': True, 'mensagem': 'Turno desativado com sucesso'})
+        return jsonify({'success': True, 'message': 'Turno desativado com sucesso!'}), 200
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 # ==================== UNIDADES ====================
 
