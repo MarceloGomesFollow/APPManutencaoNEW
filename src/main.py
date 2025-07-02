@@ -111,7 +111,20 @@ if __name__ == "__main__":
 from src import create_app
 app = create_app()
 
-# ====== Rota para relatório ======
 @app.route('/relatorio')
 def relatorio():
-    return render_template('relatorio.html')
+    # Obtenção das estatísticas de chamados
+    total = Chamado.query.count()
+    abertos = Chamado.query.filter_by(status='Em aberto').count()
+    andamento = Chamado.query.filter_by(status='Em Andamento').count()
+    concluidos = Chamado.query.filter_by(status='Concluído').count()
+
+    estatisticas = {
+        'total_chamados': total,
+        'chamados_abertos': abertos,
+        'chamados_andamento': andamento,
+        'chamados_concluidos': concluidos
+    }
+
+    # Renderiza o template, passando o objeto estatísticas
+    return render_template('relatorio.html', estatisticas=estatisticas)
