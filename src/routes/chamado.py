@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for
 
+from src.models import LocalApontamento, Turno, Unidade, NaoConformidade
+
 # 1) Importa o modelo para usar no relatório (será carregado dentro das funções após init_app)
 #    Isso garante que o SQLAlchemy já esteja inicializado.
 chamado_bp = Blueprint("chamado", __name__, url_prefix="/chamados")
@@ -21,7 +23,13 @@ def abrir_chamado():
     if request.method == "POST":
         # Implementar lógica de criação de chamado
         pass
-    return render_template("abrir_chamado.html")
+    dados = {
+        "locais_apontamento": LocalApontamento.query.filter_by(ativo=True).all(),
+        "turnos": Turno.query.filter_by(ativo=True).all(),
+        "unidades": Unidade.query.filter_by(ativo=True).all(),
+        "nao_conformidades": NaoConformidade.query.filter_by(ativo=True).all()
+    }
+    return render_template("abrir_chamado.html", dados=dados)
 
 # 4) ROTA DE DETALHES, passando o protocolo para o template
 @chamado_bp.route("/detalhes/<string:protocolo>", endpoint="detalhes_chamado")
