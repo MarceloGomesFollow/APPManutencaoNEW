@@ -38,26 +38,27 @@ def abrir_chamado():
                 'equipamento_envolvido': request.form.get('equipamento_envolvido'),
                 'codigo_equipamento': request.form.get('codigo_equipamento')
             }
-            
-                service = ChamadoService()
-                service.criar_chamado(
+
+            service = ChamadoService()
+            service.criar_chamado(
                 dados['titulo'], 
                 dados['descricao'], 
                 dados['local_especifico']
             )
-            
+
             # Upload de anexos se houver
             if 'anexos' in request.files:
                 for arquivo in request.files.getlist('anexos'):
                     if arquivo.filename:
                         save_uploaded_file(arquivo, chamado.id)
-            
+
             flash(f'Chamado criado com sucesso! Protocolo: {chamado.protocolo}', 'success')
             return redirect(url_for('web_detalhes_chamado', chamado_id=chamado.id))
-            
+
         except Exception as e:
             flash(f'Erro ao criar chamado: {str(e)}', 'error')
-           # Se GET ou erro no POST
+
+    # Se for GET ou erro no POST
     dados = {
         "locais_apontamento": LocalApontamento.query.filter_by(ativo=True).all(),
         "turnos": Turno.query.filter_by(ativo=True).all(),
@@ -65,7 +66,6 @@ def abrir_chamado():
         "nao_conformidades": NaoConformidade.query.filter_by(ativo=True).all()
     }
     return render_template("abrir_chamado.html", dados=dados)
-
 # 4) ROTA DE DETALHES, passando o protocolo para o template
 @chamado_bp.route("/detalhes/<string:protocolo>", endpoint="detalhes_chamado")
 def detalhes_chamado(protocolo):
