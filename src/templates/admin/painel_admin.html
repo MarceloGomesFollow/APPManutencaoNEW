@@ -569,7 +569,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const config = entidades[entidade];
         if (!config) return;
         
-        fetch(config.endpoint)
+        fetch(config.apiEndpoint || config.endpoint)
             .then(response => response.json())
             .then(data => {
                 preencherTabela(config.table, data, entidade);
