@@ -236,6 +236,18 @@ def api_status_chamado():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+# ==================== PERFIS ====================
+
+@admin_bp.route('/perfis/api')
+def api_perfis():
+    """API para listar perfis"""
+    try:
+        perfil_list = Perfil.query.filter_by(ativo=True).order_by(Perfil.nome).all()
+        return jsonify([s.to_dict() for s in perfil_list])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # ==================== CONTATOS NOTIFICAÇÃO ====================
 
 @admin_bp.route('/contatos-notificacao')
