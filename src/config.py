@@ -33,7 +33,7 @@ class Config:
     # -------------------------------
     # 4) Senhas de acesso
     # -------------------------------
-    SUPERVISOR_PASSWORD = os.getenv('SUPERVISOR_PASSWORD', 'Manu@1234')
+    SUPERVISOR_PASSWORD = os.getenv('SUPERVISOR_PASSWORD', 'Manu@12345')
     ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'Arfrio@4321')
 
     # -------------------------------
