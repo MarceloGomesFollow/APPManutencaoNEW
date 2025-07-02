@@ -69,6 +69,16 @@ def atualizar_turno(id):
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
 
+@admin_bp.route('/turnos/<int:id>', methods=['GET'])
+def obter_turno(id):
+    """Retorna os dados de um turno específico"""
+    try:
+        turno = Turno.query.get_or_404(id)
+        return jsonify(turno.to_dict())
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
 @admin_bp.route('/turnos/<int:id>', methods=['DELETE'])
 def deletar_turno(id):
     """Desativa um turno"""
