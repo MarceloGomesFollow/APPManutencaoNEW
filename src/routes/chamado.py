@@ -21,8 +21,38 @@ def index():
 @chamado_bp.route("/abrir", endpoint="abrir_chamado", methods=["GET", "POST"])
 def abrir_chamado():
     if request.method == "POST":
-        # Implementar lógica de criação de chamado
-        pass
+        try:
+            dados = {
+                'titulo': request.form.get('titulo'),
+                'descricao': request.form.get('descricao'),
+                'nome_solicitante': request.form.get('nome_solicitante'),
+                'email_solicitante': request.form.get('email_solicitante'),
+                'telefone_solicitante': request.form.get('telefone_solicitante'),
+                'email_notificacao': request.form.get('email_notificacao'),
+                'turno': request.form.get('turno'),
+                'unidade': request.form.get('unidade'),
+                'local_especifico': request.form.get('local_especifico'),
+                'tipo_nao_conformidade': request.form.get('tipo_nao_conformidade'),
+                'tipo_chamado': request.form.get('tipo_chamado'),
+                'prioridade': request.form.get('prioridade'),
+                'equipamento_envolvido': request.form.get('equipamento_envolvido'),
+                'codigo_equipamento': request.form.get('codigo_equipamento')
+            }
+            
+            chamado = ChamadoService.criar_chamado(dados)
+            
+            # Upload de anexos se houver
+            if 'anexos' in request.files:
+                for arquivo in request.files.getlist('anexos'):
+                    if arquivo.filename:
+                        save_uploaded_file(arquivo, chamado.id)
+            
+            flash(f'Chamado criado com sucesso! Protocolo: {chamado.protocolo}', 'success')
+            return redirect(url_for('web_detalhes_chamado', chamado_id=chamado.id))
+            
+        except Exception as e:
+            flash(f'Erro ao criar chamado: {str(e)}', 'error')
+           # Se GET ou erro no POST
     dados = {
         "locais_apontamento": LocalApontamento.query.filter_by(ativo=True).all(),
         "turnos": Turno.query.filter_by(ativo=True).all(),
