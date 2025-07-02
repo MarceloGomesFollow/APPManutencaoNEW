@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for
+from flask import Blueprint, render_template, request, session, redirect, url_for, flash
 from src.services.chamado_service import ChamadoService
 from src.models import LocalApontamento, Turno, Unidade, NaoConformidade
 
@@ -39,7 +39,8 @@ def abrir_chamado():
                 'codigo_equipamento': request.form.get('codigo_equipamento')
             }
             
-            chamado = ChamadoService.criar_chamado(dados)
+                service = ChamadoService()
+                service.criar_chamado(titulo, descricao, local_id)
             
             # Upload de anexos se houver
             if 'anexos' in request.files:
