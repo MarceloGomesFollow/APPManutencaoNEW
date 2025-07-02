@@ -726,7 +726,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 });
-                
+                form.querySelector('[name="id"]').value = data.id;
                 // Atualiza título do modal
                 const titleElement = document.querySelector(`#${config.modal} .modal-title span`);
                 if (titleElement) {
