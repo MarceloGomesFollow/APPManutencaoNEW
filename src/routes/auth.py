@@ -44,7 +44,7 @@ def admin_login():
 @admin_auth_bp.route('/supervisor-login', methods=['GET', 'POST'])
 def supervisor_login():
     if request.method == 'POST':
-        password = request.form.get('password')
+        password = request.form.get('senha')
         if password == current_app.config['SUPERVISOR_PASSWORD']:
             session['supervisor_logged_in'] = True
             session['user_type'] = 'supervisor'
