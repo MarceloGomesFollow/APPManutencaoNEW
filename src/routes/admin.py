@@ -42,8 +42,8 @@ def criar_turno():
         descricao = data.get('descricao', '')
         ativo = data.get('ativo', True)
         if not nome:
-            return jsonify({'error': 'Nome é obrigatório'}), 400
-
+            return jsonify({'success': False, 'message': 'Nome é obrigatório'}), 400
+            
         turno = Turno(nome=nome, descricao=descricao, ativo=ativo)
         db.session.add(turno)
         db.session.commit()
@@ -62,8 +62,8 @@ def atualizar_turno(id):
         turno.nome = data.get('nome', turno.nome)
         turno.ativo = data.get('ativo', turno.ativo)
         db.session.commit()
-        return jsonify(turno.to_dict())
-
+        return jsonify({'success': True, 'mensagem': 'Turno atualizado com sucesso!', 'turno': turno.to_dict()})
+        
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
@@ -75,8 +75,8 @@ def deletar_turno(id):
         turno = Turno.query.get_or_404(id)
         turno.ativo = False
         db.session.commit()
-        return jsonify({'message': 'Turno desativado com sucesso'})
-
+        return jsonify({'success': True, 'mensagem': 'Turno desativado com sucesso'})
+        
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
