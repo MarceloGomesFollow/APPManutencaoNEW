@@ -11,7 +11,7 @@
      #   print(f"Chamado criado: Título={titulo}, Descrição={descricao}, Local={local_id}")
       #  return {"status": "sucesso", "mensagem": "Chamado criado com sucesso"}
 
-from src.extensions import db
+
 from src.models import Chamado
 from datetime import datetime
 
