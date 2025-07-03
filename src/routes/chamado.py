@@ -100,19 +100,34 @@ def painel_admin():
 # 8) PAINEL SUPERVISOR
 @chamado_bp.route("/supervisor", endpoint="painel_supervisor")
 def painel_supervisor():
-    # Import dinâmico do modelo Chamado
     from src.models.chamado import Chamado
+    from src.models.turno import Turno
+    from src.models.unidade import Unidade
 
-    # Conta o total de chamados no banco
-    total = Chamado.query.count()
+    # Lista todos os chamados
+    chamados = Chamado.query.order_by(Chamado.id.desc()).all()
+
+    # Estatísticas
     estatisticas = {
-        'total_chamados': total,
-        # Adicione outras métricas, se necessário, ex.:
-        # 'abertos': Chamado.query.filter_by(status='aberto').count(),
-        # 'fechados': Chamado.query.filter_by(status='fechado').count(),
+        'total_chamados': Chamado.query.count(),
+        'chamados_abertos': Chamado.query.filter_by(status='aberto').count(),
+        'chamados_andamento': Chamado.query.filter_by(status='em_andamento').count(),
+        'chamados_concluidos': Chamado.query.filter_by(status='concluido').count()
     }
-    return render_template("painel_supervisor.html", estatisticas=estatisticas)
 
+    # Filtros
+    turnos = Turno.query.all()
+    unidades = Unidade.query.all()
+
+    return render_template(
+        "painel_supervisor.html",
+        estatisticas=estatisticas,
+        chamados=chamados,
+        dados={
+            'turnos': turnos,
+            'unidades': unidades
+        }
+    )
 # 9) LOGIN SUPERVISOR
 @chamado_bp.route("/login", endpoint="supervisor_login", methods=["GET", "POST"])
 def supervisor_login():
