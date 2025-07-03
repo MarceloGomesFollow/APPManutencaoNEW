@@ -524,7 +524,7 @@ function enviarResposta() {
     const data = Object.fromEntries(formData.entries());
     data.notificar_cliente = document.getElementById('notificarCliente').checked;
     
-    fetch('/chamado/resposta', {
+    fetch('/chamados/resposta', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
