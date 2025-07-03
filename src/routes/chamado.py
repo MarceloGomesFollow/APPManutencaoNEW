@@ -142,3 +142,22 @@ def supervisor_logout():
     session.pop("supervisor_logged_in", None)
     return redirect(url_for("chamado.index"))
 
+# 11) RESPOSTA DO TECNICO
+
+@chamado_bp.route('/resposta', methods=['POST'])
+def responder_chamado():
+    data = request.get_json()
+    protocolo = data.get("protocolo")
+    resposta = data.get("resposta_tecnico")
+    status = data.get("status")
+
+    from src.models.chamado import Chamado
+    chamado = Chamado.query.filter_by(protocolo=protocolo).first_or_404()
+
+    chamado.resposta_tecnico = resposta
+    chamado.status = status
+    chamado.data_atualizacao = datetime.utcnow()
+
+    db.session.commit()
+
+    return jsonify({"success": True, "mensagem": "Resposta salva com sucesso!"})
