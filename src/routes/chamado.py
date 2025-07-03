@@ -93,23 +93,12 @@ def relatorio():
     data_fim = params.get('data_fim')
     unidade_id = params.get('unidade')
 
-
     # Conta o total de chamados no banco
     query_chamados_total = Chamado.query
 
-    query_media = db.session.query(
-        func.avg(
-            func.julianday(Chamado.data_fechamento) -
-            func.julianday(Chamado.data_solicitacao)
-        )
-    ).filter(
-        Chamado.data_fechamento.isnot(None),
-        Chamado.status == "concluido"
-    )
     filter_status = []
 
     if data_inicio:
-        query_media = query_media.filter(Chamado.data_solicitacao >= data_inicio)
         query_chamados_total = query_chamados_total.filter(
             Chamado.data_solicitacao >= data_inicio
         )
@@ -117,7 +106,6 @@ def relatorio():
             Chamado.data_solicitacao >= data_inicio
         )
     if data_fim:
-        query_media = query_media.filter(Chamado.data_solicitacao <= data_fim)
         query_chamados_total = query_chamados_total.filter(
             Chamado.data_solicitacao <= data_fim
         )
@@ -125,7 +113,6 @@ def relatorio():
             Chamado.data_solicitacao <= data_fim
         )
     if unidade_id:
-        query_media = query_media.filter(Chamado.id_unidade == unidade_id)
         query_chamados_total = query_chamados_total.filter(
             Chamado.id_unidade == unidade_id
         )
@@ -136,7 +123,16 @@ def relatorio():
     total = query_chamados_total.count()
     chamados_pendentes = query_chamados_total.filter_by(status='aberto').count()
     chamados_concluidos = query_chamados_total.filter_by(status='concluido').count()
-    media_dias = query_media.scalar()
+    media_dias = db.session.query(
+        func.avg(
+            func.julianday(Chamado.data_fechamento) -
+            func.julianday(Chamado.data_solicitacao)
+        )
+    ).filter(
+        *filter_status,
+        Chamado.data_fechamento.isnot(None),
+        Chamado.status == "concluido",
+    ).scalar()
 
 
     estatisticas = {
@@ -156,8 +152,10 @@ def relatorio():
         'data_fim': data_fim,
         'unidade': unidade_id
     }
+
     filter_status.append(func.count(Chamado.id).label('total'))
     filter_status.append(Chamado.status)
+
     status = db.session.query(
         *filter_status
     ).group_by(Chamado.status).all()
@@ -165,6 +163,7 @@ def relatorio():
         func.count(Chamado.id).label('total'),
         Chamado.prioridade
     ).group_by(Chamado.prioridade).all()
+
     turnos = db.session.query(
         *filter_status,
         func.count(Chamado.id).label('total'),
@@ -177,6 +176,7 @@ def relatorio():
         Chamado.id_turno,
         Turno.nome
     ).all()
+
     unidades = db.session.query(
         *filter_status,
         func.count(Chamado.id).label('total'),
@@ -189,11 +189,13 @@ def relatorio():
         Chamado.id_unidade,
         Unidade.nome
     ).all()
+
     temporal = db.session.query(
         *filter_status,
         func.count(Chamado.id).label('total'),
         func.date(Chamado.data_solicitacao).label('data')
     ).group_by(func.date(Chamado.data_solicitacao)).all()
+
     graficos = {
         'status': {
             s[1]: s[0] for s in status
