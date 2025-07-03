@@ -324,7 +324,7 @@
             <form id="formResposta">
                 <div class="modal-body">
                     <input type="hidden" id="respostaChamadoId" name="chamado_id">
-                    
+                    <input type="hidden" name="protocolo" value="{{ chamado.protocolo }}">
                     <div class="mb-3">
                         <label for="respostaTecnico" class="form-label">Resposta do Técnico *</label>
                         <textarea class="form-control" id="respostaTecnico" name="resposta_tecnico" 
