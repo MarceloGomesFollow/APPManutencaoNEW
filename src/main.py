@@ -11,6 +11,8 @@ import os
 import sys
 from flask_migrate import upgrade
 from flask import render_template
+from src.models.chamado import Chamado
+
 
 # ====== PYTHONPATH para execução direta ======
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
