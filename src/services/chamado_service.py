@@ -12,28 +12,41 @@
       #  return {"status": "sucesso", "mensagem": "Chamado criado com sucesso"}
 
 
-from src.models import Chamado
+# src/services/chamado_service.py
+
+from src.models import db
+from src.models.chamado import Chamado
 from datetime import datetime
+
 
 class ChamadoService:
     def __init__(self):
         pass
 
-    def criar_chamado(self, titulo, descricao, local_id):
+    def criar_chamado(self, dados: dict):
+        """Cria um novo chamado de manutenção a partir de um dicionário de dados."""
         chamado = Chamado(
-            titulo=titulo,
-            descricao=descricao,
-            local_especifico=local_id,
-            status="Aberto",
-            data_criacao=datetime.utcnow(),
-            protocolo=self.gerar_protocolo()
+            protocolo=Chamado.gerar_proximo_protocolo(),
+            cliente_nome=dados.get('nome_solicitante'),
+            cliente_email=dados.get('email_solicitante'),
+            cliente_telefone=dados.get('telefone_solicitante'),
+            email_requisitante=dados.get('email_notificacao'),
+            telefone_requisitante=dados.get('telefone_solicitante'),
+
+            titulo=dados.get('titulo'),
+            descricao=dados.get('descricao'),
+            prioridade=dados.get('prioridade'),
+
+            id_turno=dados.get('turno'),
+            id_unidade=dados.get('unidade'),
+            id_nao_conformidade=dados.get('tipo_nao_conformidade'),
+            id_local_apontamento=dados.get('local_especifico'),
+            id_status=1,  # status inicial (se você usa 1 como "aberto")
+
+            data_solicitacao=datetime.utcnow(),
+            status="aberto"
         )
 
         db.session.add(chamado)
         db.session.commit()
         return chamado
-
-    def gerar_protocolo(self):
-        
-        from uuid import uuid4
-        return str(uuid4())[:8].upper()
