@@ -23,22 +23,21 @@ def abrir_chamado():
     if request.method == "POST":
         try:
             dados = {
-                'titulo': request.form.get('titulo'),
-                'descricao': request.form.get('descricao'),
-                'nome_solicitante': request.form.get('nome_solicitante'),
-                'email_solicitante': request.form.get('email_solicitante'),
-                'telefone_solicitante': request.form.get('telefone_solicitante'),
-                'email_notificacao': request.form.get('email_notificacao'),
-                'turno': request.form.get('turno'),
-                'unidade': request.form.get('unidade'),
-                'local_especifico': request.form.get('local_especifico'),
-                'tipo_nao_conformidade': request.form.get('tipo_nao_conformidade'),
-                'tipo_chamado': request.form.get('tipo_chamado'),
-                'prioridade': request.form.get('prioridade'),
-                'equipamento_envolvido': request.form.get('equipamento_envolvido'),
-                'codigo_equipamento': request.form.get('codigo_equipamento')
-            }
-
+    'cliente_nome': request.form.get('cliente_nome'),
+    'cliente_email': request.form.get('cliente_email'),
+    'cliente_telefone': request.form.get('cliente_telefone'),
+    'email_requisitante': request.form.get('email_requisitante'),
+    'telefone_requisitante': request.form.get('cliente_telefone'),  # opcional
+    'titulo': request.form.get('titulo'),
+    'descricao': request.form.get('descricao'),
+    'prioridade': request.form.get('prioridade'),
+    'turno': request.form.get('id_turno'),
+    'unidade': request.form.get('id_unidade'),
+    'local_especifico': request.form.get('id_local_apontamento'),
+    'tipo_nao_conformidade': request.form.get('id_nao_conformidade'),
+    'equipamento_envolvido': request.form.get('equipamento_envolvido'),
+    'codigo_equipamento': request.form.get('codigo_equipamento'),
+}
             service = ChamadoService()
             chamado = service.criar_chamado(dados)  # <-- CORRETO
 
