@@ -150,20 +150,24 @@ def supervisor_logout():
 
 @chamado_bp.route('/resposta', methods=['POST'])
 def responder_chamado():
-    print("🔥 /chamados/resposta foi acionado")
     data = request.get_json()
     protocolo = data.get("protocolo")
     resposta = data.get("resposta_tecnico")
     status = data.get("status")
 
     from src.models.chamado import Chamado
-    chamado = Chamado.query.filter_by(protocolo=protocolo).first_or_404()
+    chamado = Chamado.query.filter_by(protocolo=protocolo).first()
+
+    if not chamado:
+        return jsonify({"success": False, "mensagem": "Chamado não encontrado."}), 404
 
     chamado.resposta_tecnico = resposta
     chamado.status = status
     chamado.data_atualizacao = datetime.utcnow()
 
     db.session.commit()
+
+    return jsonify({"success": True, "mensagem": "Resposta salva com sucesso!"})
 
     return jsonify({"success": True, "mensagem": "Resposta salva com sucesso!"})
 
