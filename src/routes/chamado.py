@@ -202,7 +202,7 @@ def relatorio():
             p[1]: p[0] for p in prioridades
         } if prioridades else {},
         'turnos': {
-            t[2]: t[0] for t in turnos
+            t[-1]: t[0] for t in turnos
         } if turnos else {},
         'unidades': {
             u[-1]: u[0] for u in unidades
