@@ -197,19 +197,19 @@ def relatorio():
     graficos = {
         'status': {
             s[1]: s[0] for s in status
-        },
+        } if status else {},
         'prioridade': {
             p[1]: p[0] for p in prioridades
-        },
+        } if prioridades else {},
         'turnos': {
             t[2]: t[0] for t in turnos
-        },
+        } if turnos else {},
         'unidades': {
             u[-1]: u[0] for u in unidades
-        },
+        } if unidades else {},
         'temporal': {
             t[1]: t[0] for t in temporal
-        }
+        } if temporal else {}
     }
     # Renderiza passando o dicionário estatisticas
     return render_template(
