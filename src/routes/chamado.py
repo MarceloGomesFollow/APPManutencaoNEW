@@ -150,6 +150,7 @@ def supervisor_logout():
 
 @chamado_bp.route('/resposta', methods=['POST'])
 def responder_chamado():
+    print("🔥 /chamados/resposta foi acionado")
     data = request.get_json()
     protocolo = data.get("protocolo")
     resposta = data.get("resposta_tecnico")
