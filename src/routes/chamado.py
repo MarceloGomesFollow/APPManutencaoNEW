@@ -207,9 +207,9 @@ def relatorio():
         'unidades': {
             u[-1]: u[0] for u in unidades
         } if unidades else {},
-        'temporal': {
-            t[1]: t[0] for t in temporal
-        } if temporal else {}
+        # 'temporal': {
+        #     t[1]: t[0] for t in temporal
+        # } if temporal else {}
     }
     # Renderiza passando o dicionário estatisticas
     return render_template(
