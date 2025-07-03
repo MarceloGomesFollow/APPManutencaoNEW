@@ -166,6 +166,4 @@ def responder_chamado():
 
     return jsonify({"success": True, "mensagem": "Resposta salva com sucesso!"})
 
-   @chamado_bp.route('/ping', methods=['GET'])
-def ping():
-    return 'pong', 200
+
