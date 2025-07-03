@@ -265,13 +265,14 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <small>{{ chamado.turno_nome or '-' }}</small>
+                                            <small>{{ chamado.turno.nome if chamado.turno else '-' }}</small>
                                         </td>
                                         <td>
-                                            <small>{{ chamado.unidade_nome or '-' }}</small>
+                                            <small>{{ chamado.unidade.nome if chamado.unidade else '-' }}</small>
                                         </td>
                                         <td>
-                                            <small>{{ chamado.data_abertura }}</small>
+                                            <small>{{ chamado.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}</small>
+
                                         </td>
                                         <td>
                                             <div class="btn-group btn-group-sm" role="group">
