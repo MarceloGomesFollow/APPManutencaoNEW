@@ -48,8 +48,7 @@ def abrir_chamado():
                         save_uploaded_file(arquivo, chamado.id)
 
             flash(f'Chamado criado com sucesso! Protocolo: {chamado.protocolo}', 'success')
-            return redirect(url_for('web_detalhes_chamado', chamado_id=chamado.id))
-
+            return redirect(url_for('chamado.detalhes_chamado', protocolo=chamado.protocolo))
         except Exception as e:
             flash(f'Erro ao criar chamado: {str(e)}', 'error')
 
