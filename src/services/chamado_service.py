@@ -20,28 +20,24 @@ from datetime import datetime
 
 
 class ChamadoService:
-    def __init__(self):
-        pass
-
     def criar_chamado(self, dados: dict):
-        """Cria um novo chamado de manutenção a partir de um dicionário de dados."""
         chamado = Chamado(
             protocolo=Chamado.gerar_proximo_protocolo(),
-            cliente_nome=dados.get('nome_solicitante'),
-            cliente_email=dados.get('email_solicitante'),
-            cliente_telefone=dados.get('telefone_solicitante'),
-            email_requisitante=dados.get('email_notificacao'),
-            telefone_requisitante=dados.get('telefone_solicitante'),
+            cliente_nome=dados.get('cliente_nome'),       # mudou aqui
+            cliente_email=dados.get('cliente_email'),
+            cliente_telefone=dados.get('cliente_telefone'),
+            email_requisitante=dados.get('email_requisitante'),
+            telefone_requisitante=dados.get('telefone_requisitante'),
 
             titulo=dados.get('titulo'),
             descricao=dados.get('descricao'),
             prioridade=dados.get('prioridade'),
 
-            id_turno=dados.get('turno'),
-            id_unidade=dados.get('unidade'),
-            id_nao_conformidade=dados.get('tipo_nao_conformidade'),
-            id_local_apontamento=dados.get('local_especifico'),
-            id_status=1,  # status inicial (se você usa 1 como "aberto")
+            id_turno=int(dados.get('id_turno')) if dados.get('id_turno') else None,
+            id_unidade=int(dados.get('id_unidade')) if dados.get('id_unidade') else None,
+            id_nao_conformidade=int(dados.get('id_nao_conformidade')) if dados.get('id_nao_conformidade') else None,
+            id_local_apontamento=int(dados.get('id_local_apontamento')) if dados.get('id_local_apontamento') else None,
+            id_status=1,
 
             data_solicitacao=datetime.utcnow(),
             status="aberto"
