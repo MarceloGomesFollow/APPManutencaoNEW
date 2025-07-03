@@ -134,7 +134,6 @@ def relatorio():
         Chamado.status == "concluido",
     ).scalar()
 
-
     estatisticas = {
         'total_chamados': total,
         # você pode incluir outras métricas aqui, por ex.:
@@ -153,11 +152,10 @@ def relatorio():
         'unidade': unidade_id
     }
 
-    filter_status.append(func.count(Chamado.id).label('total'))
-    filter_status.append(Chamado.status)
-
     status = db.session.query(
-        *filter_status
+        *filter_status,
+        func.count(Chamado.id).label('total'),
+        Chamado.status
     ).group_by(Chamado.status).all()
     prioridades = db.session.query(
         func.count(Chamado.id).label('total'),
