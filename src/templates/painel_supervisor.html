@@ -529,7 +529,7 @@ async function enviarResposta() {
     data.notificar_cliente = document.getElementById('notificarCliente').checked;
 
     try {
-        const response = await fetch("https://appmanutencaonew-copy-production.up.railway.app/chamados/resposta", {
+        const response = await fetch("/chamados/resposta", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
