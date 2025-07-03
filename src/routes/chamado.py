@@ -125,8 +125,8 @@ def relatorio():
     chamados_concluidos = query_chamados_total.filter_by(status='concluido').count()
     media_dias = db.session.query(
         func.avg(
-            func.julianday(Chamado.data_fechamento) -
-            func.julianday(Chamado.data_solicitacao)
+            (Chamado.data_fechamento) -
+            (Chamado.data_solicitacao)
         )
     ).filter(
         *filter_status,
