@@ -1,6 +1,10 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
 from src.services.chamado_service import ChamadoService
 from src.models import LocalApontamento, Turno, Unidade, NaoConformidade
+from flask import jsonify
+from datetime import datetime
+from src.models import db
+
 
 # 1) Importa o modelo para usar no relatório (será carregado dentro das funções após init_app)
 #    Isso garante que o SQLAlchemy já esteja inicializado.
