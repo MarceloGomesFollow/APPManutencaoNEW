@@ -1,10 +1,12 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for, flash
-from src.services.chamado_service import ChamadoService
-from src.models import LocalApontamento, Turno, Unidade, NaoConformidade
-from flask import jsonify
 from datetime import datetime
-from src.models import db
 
+from flask import Blueprint, render_template, request, session, redirect, url_for, flash
+from flask import jsonify
+from sqlalchemy import func
+
+from src.models import LocalApontamento, Turno, Unidade, NaoConformidade
+from src.models import db
+from src.services.chamado_service import ChamadoService
 
 # 1) Importa o modelo para usar no relatório (será carregado dentro das funções após init_app)
 #    Isso garante que o SQLAlchemy já esteja inicializado.
@@ -49,7 +51,8 @@ def abrir_chamado():
             if 'anexos' in request.files:
                 for arquivo in request.files.getlist('anexos'):
                     if arquivo.filename:
-                        save_uploaded_file(arquivo, chamado.id)
+                        ...
+                        # save_uploaded_file(arquivo, chamado.id)
 
             flash(f'Chamado criado com sucesso! Protocolo: {chamado.protocolo}', 'success')
             return redirect(url_for('chamado.detalhes_chamado', protocolo=chamado.protocolo))
@@ -85,16 +88,137 @@ def relatorio():
     # 1) Import dinâmico do modelo Chamado
     from src.models.chamado import Chamado
 
+    params = request.args
+    data_inicio = params.get('data_inicio')
+    data_fim = params.get('data_fim')
+    unidade_id = params.get('unidade')
+
+
     # Conta o total de chamados no banco
-    total = Chamado.query.count()
+    query_chamados_total = Chamado.query
+
+    query_media = db.session.query(
+        func.avg(
+            func.julianday(Chamado.data_fechamento) -
+            func.julianday(Chamado.data_solicitacao)
+        )
+    ).filter(
+        Chamado.data_fechamento.isnot(None),
+        Chamado.status == "concluido"
+    )
+    filter_status = []
+
+    if data_inicio:
+        query_media = query_media.filter(Chamado.data_solicitacao >= data_inicio)
+        query_chamados_total = query_chamados_total.filter(
+            Chamado.data_solicitacao >= data_inicio
+        )
+        filter_status.append(
+            Chamado.data_solicitacao >= data_inicio
+        )
+    if data_fim:
+        query_media = query_media.filter(Chamado.data_solicitacao <= data_fim)
+        query_chamados_total = query_chamados_total.filter(
+            Chamado.data_solicitacao <= data_fim
+        )
+        filter_status.append(
+            Chamado.data_solicitacao <= data_fim
+        )
+    if unidade_id:
+        query_media = query_media.filter(Chamado.id_unidade == unidade_id)
+        query_chamados_total = query_chamados_total.filter(
+            Chamado.id_unidade == unidade_id
+        )
+        filter_status.append(
+            Chamado.id_unidade == unidade_id
+        )
+
+    total = query_chamados_total.count()
+    chamados_pendentes = query_chamados_total.filter_by(status='aberto').count()
+    chamados_concluidos = query_chamados_total.filter_by(status='concluido').count()
+    media_dias = query_media.scalar()
+
+
     estatisticas = {
         'total_chamados': total,
         # você pode incluir outras métricas aqui, por ex.:
-        # 'abertos': Chamado.query.filter_by(status='aberto').count(),
-        # 'fechados': Chamado.query.filter_by(status='fechado').count(),
+        'chamados_pendentes': chamados_pendentes,
+        'chamados_concluidos': chamados_concluidos,
+        'tempo_medio_resolucao': media_dias if media_dias else 0
+    }
+
+    dados = {
+        'unidades': Unidade.query.all()
+    }
+
+    filtros = {
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'unidade': unidade_id
+    }
+    filter_status.append(func.count(Chamado.id).label('total'))
+    filter_status.append(Chamado.status)
+    status = db.session.query(
+        *filter_status
+    ).group_by(Chamado.status).all()
+    prioridades = db.session.query(
+        func.count(Chamado.id).label('total'),
+        Chamado.prioridade
+    ).group_by(Chamado.prioridade).all()
+    turnos = db.session.query(
+        *filter_status,
+        func.count(Chamado.id).label('total'),
+        Chamado.id_turno,
+        Turno.nome.label('turno_nome')
+    ).join(
+        Turno,
+        Chamado.id_turno == Turno.id
+    ).group_by(
+        Chamado.id_turno,
+        Turno.nome
+    ).all()
+    unidades = db.session.query(
+        *filter_status,
+        func.count(Chamado.id).label('total'),
+        Chamado.id_unidade,
+        Unidade.nome.label('unidade_nome')
+    ).join(
+        Unidade,
+        Chamado.id_unidade == Unidade.id
+    ).group_by(
+        Chamado.id_unidade,
+        Unidade.nome
+    ).all()
+    temporal = db.session.query(
+        *filter_status,
+        func.count(Chamado.id).label('total'),
+        func.date(Chamado.data_solicitacao).label('data')
+    ).group_by(func.date(Chamado.data_solicitacao)).all()
+    graficos = {
+        'status': {
+            s[1]: s[0] for s in status
+        },
+        'prioridade': {
+            p[1]: p[0] for p in prioridades
+        },
+        'turnos': {
+            t[2]: t[0] for t in turnos
+        },
+        'unidades': {
+            u[-1]: u[0] for u in unidades
+        },
+        'temporal': {
+            t[1]: t[0] for t in temporal
+        }
     }
     # Renderiza passando o dicionário estatisticas
-    return render_template("relatorio.html", estatisticas=estatisticas)
+    return render_template(
+        "relatorio.html",
+        estatisticas=estatisticas,
+        dados=dados,
+        filtros=filtros,
+        graficos=graficos
+    )
 
 # 7) PAINEL ADMIN
 @chamado_bp.route("/admin", endpoint="painel_admin")
@@ -168,7 +292,3 @@ def responder_chamado():
     db.session.commit()
 
     return jsonify({"success": True, "mensagem": "Resposta salva com sucesso!"})
-
-    return jsonify({"success": True, "mensagem": "Resposta salva com sucesso!"})
-
-
