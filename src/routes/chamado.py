@@ -40,11 +40,7 @@ def abrir_chamado():
             }
 
             service = ChamadoService()
-            service.criar_chamado(
-                dados['titulo'], 
-                dados['descricao'], 
-                dados['local_especifico']
-            )
+            chamado = service.criar_chamado(dados)  # <-- CORRETO
 
             # Upload de anexos se houver
             if 'anexos' in request.files:
