@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
 # ====== Exposição do app para servidores WSGI ======
 from src import create_app
-from src.controllers.chamado import chamado_bp  # Adicionado
+from src.routes.chamado import chamado_bp       # Adicionado
 app = create_app()
 app.register_blueprint(chamado_bp)              # Adicionado
 
