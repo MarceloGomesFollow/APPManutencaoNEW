@@ -162,10 +162,10 @@ def responder_chamado():
     chamado.status = status
     chamado.data_atualizacao = datetime.utcnow()
 
-    @chamado_bp.route('/ping', methods=['GET'])
-def ping():
-    return 'pong', 200
-
     db.session.commit()
 
     return jsonify({"success": True, "mensagem": "Resposta salva com sucesso!"})
+
+   @chamado_bp.route('/ping', methods=['GET'])
+def ping():
+    return 'pong', 200
