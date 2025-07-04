@@ -564,7 +564,13 @@ function registrarAcao() {
     data.notificar_cliente = document.getElementById('notificarClienteAcao').checked;
     
     const chamadoId = document.getElementById('acaoChamadoId').value;
-fetch(`/chamados/${chamadoId}/acao`, {
+
+if (!chamadoId) {
+    mostrarAlerta("ID do chamado não informado!", "danger");
+    return;
+
+
+      fetch(`/chamados/${chamadoId}/acao`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
