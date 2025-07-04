@@ -308,4 +308,22 @@ def alterar_status(id):
     db.session.commit()
     return jsonify({"success": True, "mensagem": "Status atualizado com sucesso!"})
 
+# 13) DATALHES
+
+@chamado_bp.route("/detalhes/<string:protocolo>", endpoint="detalhes_chamado")
+def detalhes_chamado(protocolo):
+    from src.models.chamado import Chamado
+    from src.models.historico_chamado import HistoricoChamado
+    from src.models.historico_notificacoes import HistoricoNotificacoes
+
+    chamado = Chamado.query.filter_by(protocolo=protocolo).first_or_404()
+
+    estatisticas = {
+        "total_eventos": HistoricoChamado.query.filter_by(id_chamado=chamado.id).count(),
+        "mudancas_status": HistoricoChamado.query.filter_by(id_chamado=chamado.id, tipo_evento="status").count(),
+        "respostas_tecnico": HistoricoChamado.query.filter_by(id_chamado=chamado.id, tipo_evento="resposta_tecnico").count(),
+        "notificacoes_enviadas": HistoricoNotificacoes.query.filter_by(id_chamado=chamado.id).count()
+    }
+
+    return render_template("detalhes_chamado.html", chamado=chamado, estatisticas=estatisticas)
 
