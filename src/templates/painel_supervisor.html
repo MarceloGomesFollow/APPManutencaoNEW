@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function alterarStatus(chamadoId, novoStatus, selectElement) {
     const statusAtual = selectElement.dataset.statusAtual;
     
-    fetch(`/chamado/${chamadoId}/status`, {
+    fetch(`/chamados/${chamadoId}/status`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
