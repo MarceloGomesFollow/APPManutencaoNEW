@@ -563,7 +563,7 @@ function registrarAcao() {
     const data = Object.fromEntries(formData.entries());
     data.notificar_cliente = document.getElementById('notificarClienteAcao').checked;
     
-    fetch('/chamado/acao', {
+    fetch(`/chamados/${chamadoId}/acao`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
