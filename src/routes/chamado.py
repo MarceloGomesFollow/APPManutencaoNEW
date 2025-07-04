@@ -71,11 +71,22 @@ def abrir_chamado():
 @chamado_bp.route("/detalhes/<string:protocolo>", endpoint="detalhes_chamado")
 def detalhes_chamado(protocolo):
     # 1) Import dinâmico do modelo Chamado
+    from src.models.historico_chamado import HistoricoChamado
+    from src.models.historico_notificacoes import HistoricoNotificacoes
     from src.models.chamado import Chamado
 
     # Busca o chamado ou retorna 404
     chamado = Chamado.query.filter_by(protocolo=protocolo).first_or_404()
-    return render_template("detalhes_chamado.html", chamado=chamado)
+
+    estatisticas = {
+    "total_eventos": HistoricoChamado.query.filter_by(id_chamado=chamado.id).count(),
+    "mudancas_status": HistoricoChamado.query.filter_by(id_chamado=chamado.id, tipo_evento="status").count(),
+    "respostas_tecnico": HistoricoChamado.query.filter_by(id_chamado=chamado.id, tipo_evento="resposta_tecnico").count(),
+    "notificacoes_enviadas": HistoricoNotificacoes.query.filter_by(id_chamado=chamado.id).count()
+}
+
+    
+    return render_template("detalhes_chamado.html", chamado=chamado, estatisticas=estatisticas)
 
 # 5) ROTA DE CONTATOS
 @chamado_bp.route("/contatos", endpoint="gerenciar_contatos")
