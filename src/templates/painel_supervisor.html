@@ -558,8 +558,10 @@ async function enviarResposta() {
 
 
 // Função para registrar ação
-function registrarAcao() {
-    const chamadoId = document.getElementById('acaoChamadoId').value;
+
+    function registrarAcao() {
+    const chamadoId = document.getElementById('acaoChamadoId').value;  // 🔥 ESSA LINHA FALTAVA
+
     const formData = new FormData(document.getElementById('formAcao'));
     const data = Object.fromEntries(formData.entries());
     data.notificar_cliente = document.getElementById('notificarClienteAcao').checked;
@@ -584,6 +586,7 @@ function registrarAcao() {
         mostrarAlerta('Erro ao registrar ação', 'danger');
     });
 }
+
 
 
 
