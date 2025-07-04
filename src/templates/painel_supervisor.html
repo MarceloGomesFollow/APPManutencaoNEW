@@ -560,11 +560,17 @@ async function enviarResposta() {
 // Função para registrar ação
 
     function registrarAcao() {
-    const chamadoId = document.getElementById('acaoChamadoId').value;  // 🔥 ESSA LINHA FALTAVA
+    const chamadoId = document.getElementById('acaoChamadoId').value;
 
     const formData = new FormData(document.getElementById('formAcao'));
     const data = Object.fromEntries(formData.entries());
+
+    // Converte o valor do checkbox
     data.notificar_cliente = document.getElementById('notificarClienteAcao').checked;
+
+    // 🔧 Corrige o campo de descrição exigido pelo modelo
+    data.descricao = data.acao;
+    delete data.acao;
 
     fetch(`/chamados/${chamadoId}/acao`, {
         method: 'POST',
