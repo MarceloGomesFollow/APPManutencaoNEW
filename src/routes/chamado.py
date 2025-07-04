@@ -89,7 +89,7 @@ def detalhes_chamado(protocolo):
     # Pega todo o histórico de interação (ordenado do mais recente ao mais antigo)
     historico = HistoricoChamado.query \
         .filter_by(id_chamado=chamado.id) \
-        .order_by(HistoricoChamado.data_evento.desc()) \
+        .order_by(HistoricoChamado.data_hora.desc()) \
         .all()
 
     return render_template(
