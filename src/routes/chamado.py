@@ -292,3 +292,20 @@ def responder_chamado():
     db.session.commit()
 
     return jsonify({"success": True, "mensagem": "Resposta salva com sucesso!"})
+
+# 12) ATUALIZA STATUS
+
+@chamado_bp.route('/<int:id>/status', methods=['PUT'])
+def alterar_status(id):
+    from src.models.chamado import Chamado
+    data = request.get_json()
+    novo_status = data.get('status')
+
+    chamado = Chamado.query.get_or_404(id)
+    chamado.status = novo_status
+    chamado.data_atualizacao = datetime.utcnow()
+
+    db.session.commit()
+    return jsonify({"success": True, "mensagem": "Status atualizado com sucesso!"})
+
+
