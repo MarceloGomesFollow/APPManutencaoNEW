@@ -344,7 +344,7 @@ def registrar_acao(id):
     nova_acao = HistoricoChamado(
         id_chamado=id,
         tipo_evento='acao',
-        descricao=dados.get('acao'),
+        descricao=dados.get('descricao'),
         data_hora=datetime.utcnow()
         # Inclua mais campos se necessário
     )
