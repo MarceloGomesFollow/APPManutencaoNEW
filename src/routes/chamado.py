@@ -331,3 +331,28 @@ def alterar_status(id):
     db.session.commit()
     return jsonify({"success": True, "mensagem": "Status atualizado com sucesso!"})
 
+
+# 13) REGISTRAR AÇÃO
+
+@chamado_bp.route('/<int:id>/acao', methods=['POST'])
+def registrar_acao(id):
+    from src.models.historico_chamado import HistoricoChamado
+    from src import db
+    from flask import request, jsonify
+
+    dados = request.get_json()
+
+    nova_acao = HistoricoChamado(
+        id_chamado=id,
+        tipo_evento='acao',
+        descricao=dados.get('acao'),
+        data_hora=datetime.utcnow()
+        # Inclua mais campos se necessário
+    )
+
+    db.session.add(nova_acao)
+    db.session.commit()
+
+    return jsonify({"success": True})
+
+
