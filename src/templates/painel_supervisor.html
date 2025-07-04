@@ -281,13 +281,11 @@
                                                     <i class="bi bi-eye"></i>
                                                 </a>
                                                 <button class="btn btn-outline-primary" 
-                                                        data-id="{{ chamado.id }}"
                                                         onclick="abrirModalResposta('{{ chamado.id }}')" 
                                                         title="Responder">
                                                     <i class="bi bi-chat-dots"></i>
                                                 </button>
-                                                <button class="btn btn-outline-success" 
-                                                        data-id="{{ chamado.id }}"
+                                                <button class="btn btn-outline-success"  
                                                         onclick="abrirModalAcao('{{ chamado.id }}')" 
                                                         title="Registrar Ação">
                                                     <i class="bi bi-tools"></i>
@@ -565,13 +563,7 @@ function registrarAcao() {
     const data = Object.fromEntries(formData.entries());
     data.notificar_cliente = document.getElementById('notificarClienteAcao').checked;
     
-    const chamadoId = document.getElementById('acaoChamadoId').value;
-
-if (!chamadoId) {
-    mostrarAlerta("ID do chamado não informado!", "danger");
-    return;
-
-
+    
       fetch(`/chamados/${chamadoId}/acao`, {
         method: 'POST',
         headers: {
