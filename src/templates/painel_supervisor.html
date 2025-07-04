@@ -559,22 +559,20 @@ async function enviarResposta() {
 
 // Função para registrar ação
 function registrarAcao() {
+    const chamadoId = document.getElementById('acaoChamadoId').value;
     const formData = new FormData(document.getElementById('formAcao'));
     const data = Object.fromEntries(formData.entries());
     data.notificar_cliente = document.getElementById('notificarClienteAcao').checked;
-    
-    
-      fetch(`/chamados/${chamadoId}/acao`, {
+
+    fetch(`/chamados/${chamadoId}/acao`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
     .then(response => response.json())
     .then(result => {
         if (result.success) {
-            mostrarAlerta('Ação registrada com sucesso!', 'success');
+            mostrarAlerta('✅ Ação registrada com sucesso!', 'success');
             bootstrap.Modal.getInstance(document.getElementById('modalAcao')).hide();
             setTimeout(() => location.reload(), 1000);
         } else {
@@ -586,6 +584,8 @@ function registrarAcao() {
         mostrarAlerta('Erro ao registrar ação', 'danger');
     });
 }
+
+
 
 // Função para aplicar filtros
 function aplicarFiltros() {
