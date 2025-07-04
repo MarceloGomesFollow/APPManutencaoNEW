@@ -57,24 +57,36 @@
                     <!-- Informações de Classificação -->
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <h6 class="text-muted mb-2">
-                                <i class="bi bi-tags"></i> Classificação
-                            </h6>
-                            <ul class="list-unstyled">
-                                {% if chamado.turno_nome %}
-                                <li><strong>Turno:</strong> {{ chamado.turno_nome }}</li>
-                                {% endif %}
-                                {% if chamado.unidade_nome %}
-                                <li><strong>Unidade:</strong> {{ chamado.unidade_nome }}</li>
-                                {% endif %}
-                                {% if chamado.local_apontamento_nome %}
-                                <li><strong>Local:</strong> {{ chamado.local_apontamento_nome }}</li>
-                                {% endif %}
-                                {% if chamado.nao_conformidade_nome %}
-                                <li><strong>Não Conformidade:</strong> {{ chamado.nao_conformidade_nome }}</li>
-                                {% endif %}
-                            </ul>
-                        </div>
+                 <h6 class="text-muted mb-2">
+                 <i class="bi bi-tags"></i> Classificação
+                </h6>
+                <ul class="list-unstyled">
+                {% if chamado.prioridade %}
+               <li><strong>Prioridade:</strong>
+                {% if chamado.prioridade == 'alta' %}🔴 Alta
+                {% elif chamado.prioridade == 'media' %}🟡 Média
+                {% else %}🟢 Baixa
+                {% endif %}
+               </li>
+                {% endif %}
+
+                {% if chamado.turno %}
+               <li><strong>Turno:</strong> {{ chamado.turno.nome }}</li>
+               {% endif %}
+
+              {% if chamado.unidade %}
+              <li><strong>Unidade:</strong> {{ chamado.unidade.nome }}</li>
+              {% endif %}
+
+             {% if chamado.local_apontamento %}
+             <li><strong>Local:</strong> {{ chamado.local_apontamento.nome }}</li>
+             {% endif %}
+
+             {% if chamado.nao_conformidade %}
+             <li><strong>Não Conformidade:</strong> {{ chamado.nao_conformidade.nome }}</li>
+             {% endif %}
+             </ul>
+             </div>
                         <div class="col-md-6">
                             <h6 class="text-muted mb-2">
                                 <i class="bi bi-person"></i> Solicitante
@@ -91,29 +103,33 @@
                     
                     <!-- Datas Importantes -->
                     <div class="row mb-3">
-                        <div class="col-12">
-                            <h6 class="text-muted mb-2">
-                                <i class="bi bi-calendar"></i> Datas Importantes
-                            </h6>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <small class="text-muted">Abertura:</small><br>
-                                    <strong>{{ chamado.data_abertura }}</strong>
-                                </div>
-                                {% if chamado.data_inicio_atendimento %}
-                                <div class="col-md-4">
-                                    <small class="text-muted">Início Atendimento:</small><br>
-                                    <strong>{{ chamado.data_inicio_atendimento }}</strong>
-                                </div>
-                                {% endif %}
-                                {% if chamado.data_conclusao %}
-                                <div class="col-md-4">
-                                    <small class="text-muted">Conclusão:</small><br>
-                                    <strong>{{ chamado.data_conclusao }}</strong>
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
+                      <div class="col-12">
+    <h6 class="text-muted mb-2">
+        <i class="bi bi-calendar"></i> Datas Importantes
+    </h6>
+    <div class="row">
+        {% if chamado.data_solicitacao %}
+        <div class="col-md-4">
+            <small class="text-muted">Abertura:</small><br>
+            <strong>{{ chamado.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}</strong>
+        </div>
+        {% endif %}
+
+        {% if chamado.data_inicio_atendimento %}
+        <div class="col-md-4">
+            <small class="text-muted">Início Atendimento:</small><br>
+            <strong>{{ chamado.data_inicio_atendimento.strftime('%d/%m/%Y %H:%M') }}</strong>
+        </div>
+        {% endif %}
+
+        {% if chamado.data_fechamento %}
+        <div class="col-md-4">
+            <small class="text-muted">Conclusão:</small><br>
+            <strong>{{ chamado.data_fechamento.strftime('%d/%m/%Y %H:%M') }}</strong>
+        </div>
+        {% endif %}
+    </div>
+</div>
                     </div>
                     
                     <!-- Resposta do Técnico -->
