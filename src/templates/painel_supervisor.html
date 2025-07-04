@@ -568,10 +568,6 @@ async function enviarResposta() {
     // Converte o valor do checkbox
     data.notificar_cliente = document.getElementById('notificarClienteAcao').checked;
 
-    // 🔧 Corrige o campo de descrição exigido pelo modelo
-    data.descricao = data.acao_tomada;
-    delete data.acao;
-
     fetch(`/chamados/${chamadoId}/acao`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
