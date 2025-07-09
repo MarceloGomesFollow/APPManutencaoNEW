@@ -146,23 +146,22 @@ def relatorio():
     total = query_chamados_total.count()
     chamados_pendentes = query_chamados_total.filter_by(status='aberto').count()
     chamados_concluidos = query_chamados_total.filter_by(status='concluido').count()
-    media_dias = db.session.query(
-        func.avg(
-            (Chamado.data_fechamento) -
-            (Chamado.data_solicitacao)
-        )
-    ).filter(
-        *filter_status,
-        Chamado.data_fechamento.isnot(None),
-        Chamado.status == "concluido",
-    ).scalar()
+    # media_dias = db.session.query(
+    #     func.avg(
+    #         (Chamado.data_fechamento) -
+    #         (Chamado.data_solicitacao)
+    #     )
+    # ).filter(
+    #     *filter_status,
+    #     Chamado.data_fechamento.isnot(None),
+    #     Chamado.status == "concluido",
+    # ).scalar()
 
     estatisticas = {
         'total_chamados': total,
         # você pode incluir outras métricas aqui, por ex.:
         'chamados_pendentes': chamados_pendentes,
-        'chamados_concluidos': chamados_concluidos,
-        'tempo_medio_resolucao': media_dias if media_dias else 0
+        'chamados_concluidos': chamados_concluidos
     }
 
     dados = {

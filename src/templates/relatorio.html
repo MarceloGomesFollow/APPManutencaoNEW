@@ -76,7 +76,7 @@
     </div>
     
     <!-- Cards de Estatísticas Gerais -->
-    <div class="row mb-4">
+    <div class="row d-flex justify-content-between align-items-center">
         <div class="col-md-3 mb-3">
             <div class="card bg-primary text-white">
                 <div class="card-body">
@@ -84,10 +84,12 @@
                         <div>
                             <h3 class="mb-0">{{ estatisticas.total_chamados or 0 }}</h3>
                             <p class="mb-0">Total de Chamados</p>
+                            <br>
                         </div>
                         <div class="align-self-center">
                             <i class="bi bi-ticket-detailed" style="font-size: 2.5rem;"></i>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -121,23 +123,6 @@
                         </div>
                         <div class="align-self-center">
                             <i class="bi bi-clock" style="font-size: 2.5rem;"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h3 class="mb-0">{{ "%.1f"|format(estatisticas.tempo_medio_resolucao or 0) }}</h3>
-                            <p class="mb-0">Tempo Médio (dias)</p>
-                            <small>Para resolução</small>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="bi bi-stopwatch" style="font-size: 2.5rem;"></i>
                         </div>
                     </div>
                 </div>
@@ -321,7 +306,9 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 <script>
+Chart.register(ChartDataLabels);
 document.addEventListener('DOMContentLoaded', function() {
     // Dados para os gráficos (vindos do backend)
     const dadosGraficos = {
@@ -361,6 +348,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 plugins: {
                     legend: {
                         position: 'bottom'
+                    },
+                    datalabels: {
+                        color: '#111',
+                        formatter: (value, context) => {
+                            const label = context.chart.data.labels[context.dataIndex];
+                            return `${label}: ${value}`;
+                        },
+                        font: {
+                            weight: 'bold'
+                        }
                     }
                 }
             }
@@ -399,6 +396,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    datalabels: {
+                        color: '#111',
+                        formatter: (value, context) => {
+                            const label = context.chart.data.labels[context.dataIndex];
+                            return `${label}: ${value}`;
+                        }
                     }
                 }
             }
@@ -434,6 +438,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    datalabels: {
+                        color: '#111',
+                        formatter: (value, context) => {
+                            // Pega o label correspondente ao valor
+                            const label = context.chart.data.labels[context.dataIndex];
+                            return `${label}: ${value}`;
+                        },
+                        font: {
+                            weight: 'bold'
+                        }
                     }
                 }
             }
@@ -467,6 +482,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 plugins: {
                     legend: {
                         position: 'bottom'
+                    },
+                    datalabels: {
+                        color: '#111',
+                        formatter: (value, context) => {
+                            // Pega o label correspondente ao valor
+                            const label = context.chart.data.labels[context.dataIndex];
+                            return `${label}: ${value}`;
+                        },
+                        font: {
+                            weight: 'bold'
+                        }
                     }
                 }
             }
@@ -513,6 +539,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 plugins: {
                     legend: {
                         position: 'top'
+                    },
+                    datalabels: {
+                        color: '#111',
+                        formatter: (value, context) => {
+                            // Pega o label correspondente ao valor
+                            const label = context.chart.data.labels[context.dataIndex];
+                            return `${label}: ${value}`;
+                        },
+                        font: {
+                            weight: 'bold'
+                        }
                     }
                 }
             }
