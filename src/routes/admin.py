@@ -200,21 +200,60 @@ def api_nao_conformidades():
 def criar_nao_conformidade():
     """Cria uma nova não conformidade"""
     try:
-        nome = request.form.get('nome')
+        data = request.get_json()
+        nome = data.get('nome')
         if not nome:
             flash('Nome é obrigatório', 'error')
-            return redirect(url_for('admin.listar_nao_conformidades'))
+            return jsonify({'success': False, 'message': 'Nome é obrigatório'}), 400
 
-        nc = NaoConformidade(nome=nome)
-        db.session.add(nc)
+        nao_conformidade = NaoConformidade(nome=nome)
+        db.session.add(nao_conformidade)
         db.session.commit()
         flash('Não conformidade criada com sucesso!', 'success')
-        return redirect(url_for('admin.listar_nao_conformidades'))
+        return jsonify({'success': True, 'message': 'Não conformidade criado com sucesso!', 'naoConformidades': nao_conformidade.to_dict()}), 201
 
     except Exception as e:
         db.session.rollback()
         flash(f'Erro ao criar não conformidade: {e}', 'error')
-        return redirect(url_for('admin.listar_nao_conformidades'))
+        return jsonify({'error': str(e)}), 500
+
+@admin_bp.route('/nao-conformidades/<int:id>', methods=['PUT'])
+def atualizar_nao_conformidades(id):
+    """Atualiza um turno"""
+    try:
+        nao_conformidade = NaoConformidade.query.get_or_404(id)
+        data = request.get_json()
+        nao_conformidade.nome = data.get('nome', nao_conformidade.nome)
+        nao_conformidade.ativo = data.get('ativo', nao_conformidade.ativo)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Local de apontamento atualizado com sucesso!', 'naoConformidades': nao_conformidade.to_dict()}), 200
+
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin_bp.route('/nao-conformidades/<int:id>', methods=['GET'])
+def obter_nao_conformidades(id):
+    """Retorna os dados de um Local de Apontamento específico"""
+    try:
+        nao_conformidade = NaoConformidade.query.get_or_404(id)
+        return jsonify(nao_conformidade.to_dict())
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin_bp.route('/nao-conformidades/<int:id>', methods=['DELETE'])
+def deletar_nao_conformidades(id):
+    """Desativa um unidade"""
+    try:
+        nao_conformidade = NaoConformidade.query.get_or_404(id)
+        nao_conformidade.ativo = False
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Nao conformidade desativado com sucesso!'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 # ==================== LOCAIS DE APONTAMENTO ====================
 
@@ -283,7 +322,6 @@ def obter_local_apontamento(id):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-
 @admin_bp.route('/locais-apontamento/<int:id>', methods=['DELETE'])
 def deletar_local_apontamento(id):
     """Desativa um unidade"""
@@ -318,6 +356,65 @@ def api_status_chamado():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@admin_bp.route('/status-chamado', methods=['POST'])
+def criar_status_chamado():
+    """Cria um novo status de chamado"""
+    try:
+        data = request.get_json()
+        nome = data.get('nome')
+        if not nome:
+            flash('Nome é obrigatório', 'error')
+            return jsonify({'success': False, 'message': 'Nome é obrigatório'}), 400
+
+        status_chamado = StatusChamado(nome=nome)
+        db.session.add(status_chamado)
+        db.session.commit()
+        flash('Status de chamado criado com sucesso!', 'success')
+        return jsonify({'success': True, 'message': 'Unidade criado com sucesso!', 'status': status_chamado.to_dict()}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erro ao criar status de chamado: {e}', 'error')
+        return jsonify({'error': str(e)}), 500
+
+@admin_bp.route('/status-chamado/<int:id>', methods=['PUT'])
+def atualizar_status_chamado(id):
+    """Atualiza um Status de Chamado"""
+    try:
+        status_chamado = StatusChamado.query.get_or_404(id)
+        data = request.get_json()
+        status_chamado.nome = data.get('nome', status_chamado.nome)
+        status_chamado.ativo = data.get('ativo', status_chamado.ativo)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Status de chamado atualizado com sucesso!', 'local': status_chamado.to_dict()}), 200
+
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin_bp.route('/status-chamado/<int:id>', methods=['GET'])
+def obter_status_chamado(id):
+    """Retorna os dados de um Status de Chamado específico"""
+    try:
+        status_chamado = StatusChamado.query.get_or_404(id)
+        return jsonify(status_chamado.to_dict())
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin_bp.route('/status-chamado/<int:id>', methods=['DELETE'])
+def deletar_status_chamado(id):
+    """Desativa um Status de Chamado"""
+    try:
+        status_chamado = StatusChamado.query.get_or_404(id)
+        status_chamado.ativo = False
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Status de chamado desativado com sucesso!'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 
 # ==================== PERFIS ====================
 
@@ -329,6 +426,66 @@ def api_perfis():
         return jsonify([s.to_dict() for s in perfil_list])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/perfis', methods=['POST'])
+def criar_perfis():
+    """Cria um novo Perfil Usuario"""
+    try:
+        data = request.get_json()
+        nome = data.get('nome')
+        descricao = data.get('descricao')
+        if not nome:
+            flash('Nome é obrigatório', 'error')
+            return jsonify({'success': False, 'message': 'Nome é obrigatório'}), 400
+
+        perfil = Perfil(nome=nome, descricao=descricao)
+        db.session.add(perfil)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Unidade criado com sucesso!', 'perfil': perfil.to_dict()}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erro ao criar status de chamado: {e}', 'error')
+        return jsonify({'error': str(e)}), 500
+
+@admin_bp.route('/perfis/<int:id>', methods=['PUT'])
+def atualizar_perfis(id):
+    """Atualiza um Perfil Usuario"""
+    try:
+        perfil = Perfil.query.get_or_404(id)
+        data = request.get_json()
+        perfil.nome = data.get('nome', perfil.nome)
+        perfil.ativo = data.get('ativo', perfil.ativo)
+        perfil.descricao = data.get('descricao', perfil.descricao)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Perfil de Usuario atualizado com sucesso!', 'local': perfil.to_dict()}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin_bp.route('/perfis/<int:id>', methods=['GET'])
+def obter_perfis(id):
+    """Retorna os dados de um Perfil Usuario específico"""
+    try:
+        perfil = Perfil.query.get_or_404(id)
+        return jsonify(perfil.to_dict())
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin_bp.route('/perfis/<int:id>', methods=['DELETE'])
+def deletar_perfis(id):
+    """Desativa um Perfil Usuario"""
+    try:
+        perfil = Perfil.query.get_or_404(id)
+        perfil.ativo = False
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Perfil Usuario desativado com sucesso!'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 # ==================== CONTATOS NOTIFICAÇÃO ====================
 
