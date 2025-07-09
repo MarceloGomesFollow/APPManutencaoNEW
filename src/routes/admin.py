@@ -117,21 +117,63 @@ def api_unidades():
 def criar_unidade():
     """Cria uma nova unidade"""
     try:
-        nome = request.form.get('nome')
+        data = request.get_json()
+        nome = data.get('nome')
         if not nome:
             flash('Nome é obrigatório', 'error')
-            return redirect(url_for('admin.listar_unidades'))
+            return jsonify({'success': False, 'message': 'Nome é obrigatório'}), 400
 
         unidade = Unidade(nome=nome)
         db.session.add(unidade)
         db.session.commit()
         flash('Unidade criada com sucesso!', 'success')
-        return redirect(url_for('admin.listar_unidades'))
+        return jsonify({'success': True, 'message': 'Unidade criado com sucesso!', 'unidade': unidade.to_dict()}), 201
 
     except Exception as e:
         db.session.rollback()
         flash(f'Erro ao criar unidade: {e}', 'error')
-        return redirect(url_for('admin.listar_unidades'))
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/unidades/<int:id>', methods=['PUT'])
+def atualizar_unidade(id):
+    """Atualiza um turno"""
+    try:
+        unidade = Unidade.query.get_or_404(id)
+        data = request.get_json()
+        unidade.nome = data.get('nome', unidade.nome)
+        unidade.ativo = data.get('ativo', unidade.ativo)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Unidade atualizado com sucesso!', 'unidade': unidade.to_dict()}), 200
+
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@admin_bp.route('/unidades/<int:id>', methods=['GET'])
+def obter_unidade(id):
+    """Retorna os dados de um Unidad específico"""
+    try:
+        turno = Unidade.query.get_or_404(id)
+        return jsonify(turno.to_dict())
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@admin_bp.route('/unidades/<int:id>', methods=['DELETE'])
+def deletar_unidade(id):
+    """Desativa um unidade"""
+    try:
+        turno = Unidade.query.get_or_404(id)
+        turno.ativo = False
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Unidade desativado com sucesso!'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 # ==================== NÃO CONFORMIDADES ====================
 

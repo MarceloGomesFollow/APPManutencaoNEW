@@ -36,6 +36,38 @@
             color: white;
         }
     </style>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+          document.getElementById('formNovoTurno').addEventListener('submit', function (e) {
+              e.preventDefault();
+
+            const nome = document.getElementById('nome').value;
+
+            fetch('/admin/unidades', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nome: nome,
+                    ativo: true
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    alert('Unidade criado com sucesso!');
+                    location.reload();
+                } else {
+                    alert('Erro ao criar unidade: ' + (data.error || 'Erro desconhecido'));
+                }
+            })
+            .catch(error => {
+                alert('Erro na requisição: ' + error);
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="container py-4">
@@ -139,7 +171,7 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" title="Fechar modal"></button>
                 </div>
-                <form method="POST" action="/admin/unidades">
+                <form id="formNovoUnidade">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="nome" class="form-label">Nome da Unidade</label>
