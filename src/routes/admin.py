@@ -166,8 +166,8 @@ def obter_unidade(id):
 def deletar_unidade(id):
     """Desativa um unidade"""
     try:
-        turno = Unidade.query.get_or_404(id)
-        turno.ativo = False
+        unidade = Unidade.query.get_or_404(id)
+        unidade.ativo = False
         db.session.commit()
         return jsonify({'success': True, 'message': 'Unidade desativado com sucesso!'}), 200
 
@@ -241,21 +241,61 @@ def api_locais_apontamento():
 def criar_local_apontamento():
     """Cria um novo local de apontamento"""
     try:
-        nome = request.form.get('nome')
+        data = request.get_json()
+        nome = data.get('nome')
         if not nome:
             flash('Nome é obrigatório', 'error')
-            return redirect(url_for('admin.listar_locais_apontamento'))
+            return jsonify({'success': False, 'message': 'Nome é obrigatório'}), 400
 
         local = LocalApontamento(nome=nome)
         db.session.add(local)
         db.session.commit()
         flash('Local de apontamento criado com sucesso!', 'success')
-        return redirect(url_for('admin.listar_locais_apontamento'))
+        return jsonify({'success': True, 'message': 'Unidade criado com sucesso!', 'unidade': local.to_dict()}), 201
 
     except Exception as e:
         db.session.rollback()
         flash(f'Erro ao criar local: {e}', 'error')
-        return redirect(url_for('admin.listar_locais_apontamento'))
+        return jsonify({'error': str(e)}), 500
+
+@admin_bp.route('/locais-apontamento/<int:id>', methods=['PUT'])
+def atualizar_local_apontamento(id):
+    """Atualiza um turno"""
+    try:
+        local = LocalApontamento.query.get_or_404(id)
+        data = request.get_json()
+        local.nome = data.get('nome', local.nome)
+        local.ativo = data.get('ativo', local.ativo)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Local de apontamento atualizado com sucesso!', 'local': local.to_dict()}), 200
+
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin_bp.route('/locais-apontamento/<int:id>', methods=['GET'])
+def obter_local_apontamento(id):
+    """Retorna os dados de um Local de Apontamento específico"""
+    try:
+        local = LocalApontamento.query.get_or_404(id)
+        return jsonify(local.to_dict())
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@admin_bp.route('/locais-apontamento/<int:id>', methods=['DELETE'])
+def deletar_local_apontamento(id):
+    """Desativa um unidade"""
+    try:
+        local = LocalApontamento.query.get_or_404(id)
+        local.ativo = False
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Local desativado com sucesso!'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 # ==================== STATUS CHAMADO ====================
 
