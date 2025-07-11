@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
         prioridade: {{ graficos.prioridade|tojson if graficos and graficos.prioridade else '{}' }},
         turnos: {{ graficos.turnos|tojson if graficos and graficos.turnos else '{}' }},
         unidades: {{ graficos.unidades|tojson if graficos and graficos.unidades else '{}' }},
-        temporal: {{ graficos.temporal|tojson if graficos and graficos.temporal else '{}' }}
+        temporal: {{ graficos.temporal|tojson if graficos and graficos.temporal else '{s: 1}' }}
     };
     
     // Configurações padrão dos gráficos
@@ -515,61 +515,112 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Gráfico Temporal (Linha)
-    if (dadosGraficos.temporal && dadosGraficos.temporal.labels && dadosGraficos.temporal.labels.length > 0) {
+<!--    if (dadosGraficos.temporal && dadosGraficos.temporal.labels && dadosGraficos.temporal.labels.length > 0) {-->
+<!--        const ctxTemporal = document.getElementById('graficoTemporal').getContext('2d');-->
+<!--        new Chart(ctxTemporal, {-->
+<!--            type: 'line',-->
+<!--            data: {-->
+<!--                labels: dadosGraficos.temporal.labels,-->
+<!--                datasets: [-->
+<!--                    {-->
+<!--                        label: 'Chamados Abertos',-->
+<!--                        data: dadosGraficos.temporal.abertos,-->
+<!--                        borderColor: '#007bff',-->
+<!--                        backgroundColor: 'rgba(0, 123, 255, 0.1)',-->
+<!--                        tension: 0.4,-->
+<!--                        fill: true-->
+<!--                    },-->
+<!--                    {-->
+<!--                        label: 'Chamados Concluídos',-->
+<!--                        data: dadosGraficos.temporal.concluidos,-->
+<!--                        borderColor: '#28a745',-->
+<!--                        backgroundColor: 'rgba(40, 167, 69, 0.1)',-->
+<!--                        tension: 0.4,-->
+<!--                        fill: true-->
+<!--                    }-->
+<!--                ]-->
+<!--            },-->
+<!--            options: {-->
+<!--                responsive: true,-->
+<!--                maintainAspectRatio: false,-->
+<!--                scales: {-->
+<!--                    y: {-->
+<!--                        beginAtZero: true,-->
+<!--                        ticks: {-->
+<!--                            stepSize: 1-->
+<!--                        }-->
+<!--                    }-->
+<!--                },-->
+<!--                plugins: {-->
+<!--                    legend: {-->
+<!--                        position: 'top'-->
+<!--                    },-->
+<!--                    datalabels: {-->
+<!--                        color: '#111',-->
+<!--                        formatter: (value, context) => {-->
+<!--                            // Pega o label correspondente ao valor-->
+<!--                            const label = context.chart.data.labels[context.dataIndex];-->
+<!--                            return `${label}: ${value}`;-->
+<!--                        },-->
+<!--                        font: {-->
+<!--                            weight: 'bold'-->
+<!--                        }-->
+<!--                    }-->
+<!--                }-->
+<!--            }-->
+<!--        });-->
+<!--    }-->
+
+<!--    if (true) {-->
+        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'];
+        const produtos = {
+          "Total Chamados": [120, 190, 90, 140, 200, 170],
+          "Pendentes": [80, 110, 150, 70, 90, 120],
+          "Aguardando material": [50, 60, 75, 100, 85, 60]
+        };
         const ctxTemporal = document.getElementById('graficoTemporal').getContext('2d');
         new Chart(ctxTemporal, {
-            type: 'line',
-            data: {
-                labels: dadosGraficos.temporal.labels,
-                datasets: [
-                    {
-                        label: 'Chamados Abertos',
-                        data: dadosGraficos.temporal.abertos,
-                        borderColor: '#007bff',
-                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Chamados Concluídos',
-                        data: dadosGraficos.temporal.concluidos,
-                        borderColor: '#28a745',
-                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }
-                ]
-            },
-            options: {
+            type: 'bar',
+              data: {
+                labels: meses,
+                datasets: Object.keys(produtos).map((produto, index) => {
+                  const cores = [
+                    '#007bff',
+                    '#28a745',
+                    '#ffc107',   // Verde
+                  ];
+                  return {
+                    label: produto,
+                    data: produtos[produto],
+                    backgroundColor: cores[index],
+                    borderColor: cores[index].replace('0.7', '1'), // Remove transparência
+                    borderWidth: 1
+                  };
+                })
+              },
+              options: {
                 responsive: true,
-                maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
+                  x: {
+                    title: { display: true, text: 'Mês' },
+                    grid: { display: false }
+                  },
+                  y: {
+                    title: { display: true, text: 'Vendas (unidades)' },
+                    beginAtZero: true
+                  }
                 },
                 plugins: {
-                    legend: {
-                        position: 'top'
-                    },
-                    datalabels: {
-                        color: '#111',
-                        formatter: (value, context) => {
-                            // Pega o label correspondente ao valor
-                            const label = context.chart.data.labels[context.dataIndex];
-                            return `${label}: ${value}`;
-                        },
-                        font: {
-                            weight: 'bold'
-                        }
+                  legend: { position: 'top' },
+                  tooltip: {
+                    callbacks: {
+                      afterLabel: (context) => `Total: ${context.dataset.data[context.dataIndex]} unidades`
                     }
+                  }
                 }
             }
         });
-    }
+<!--    }-->
     
     // Formulário de período
     document.getElementById('formPeriodo').addEventListener('submit', function(e) {
