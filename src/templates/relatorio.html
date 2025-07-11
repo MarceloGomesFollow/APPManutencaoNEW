@@ -237,7 +237,7 @@
                                     <th>Unidade</th>
                                     <th>Data Abertura</th>
                                     <th>Data Conclusão</th>
-                                    <th>Tempo Resolução</th>
+<!--                                    <th>Tempo Resolução</th>-->
                                 </tr>
                             </thead>
                             <tbody>
@@ -245,7 +245,7 @@
                                     {% for chamado in chamados %}
                                     <tr>
                                         <td>
-                                            <a href="{{ url_for('chamado.detalhes_chamado', id=chamado.id) }}" 
+                                            <a href="{{ url_for('chamado.detalhes_chamado', protocolo=chamado.protocolo) }}"
                                                class="text-decoration-none">
                                                 <strong>#{{ chamado.protocolo or chamado.id[:8] }}</strong>
                                             </a>
@@ -273,17 +273,17 @@
                                                 {{ chamado.status|replace('_', ' ')|title }}
                                             </span>
                                         </td>
-                                        <td>{{ chamado.turno_nome or '-' }}</td>
-                                        <td>{{ chamado.unidade_nome or '-' }}</td>
-                                        <td>{{ chamado.data_abertura }}</td>
-                                        <td>{{ chamado.data_conclusao or '-' }}</td>
-                                        <td>
-                                            {% if chamado.tempo_resolucao %}
-                                                {{ "%.1f"|format(chamado.tempo_resolucao) }} dias
-                                            {% else %}
-                                                -
-                                            {% endif %}
-                                        </td>
+                                        <td>{{ chamado.turno.nome if chamado.turno else '-' }}</td>
+                                        <td>{{ chamado.unidade.nome if chamado.unidade else '-' }}</td>
+                                        <td>{{ chamado.data_solicitacao.strftime('%d/%m/%Y %H:%M') if chamado.data_solicitacao else '-' }}</td>
+                                        <td>{{ chamado.data_fechamento.strftime('%d/%m/%Y %H:%M') if chamado.data_fechamento else '-' }}</td>
+<!--                                        <td>-->
+<!--                                            {% if chamado.tempo_resolucao %}-->
+<!--                                                {{ "%.1f"|format(chamado.tempo_resolucao) }} dias-->
+<!--                                            {% else %}-->
+<!--                                                - -->
+<!--                                            {% endif %}-->
+<!--                                        </td>-->
                                     </tr>
                                     {% endfor %}
                                 {% else %}
@@ -297,6 +297,21 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+                <div class="card-footer d-flex justify-content-end">
+                    <nav aria-label="Page navigation example">
+                      <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                        <li class="page-item"><a class="page-link" href="">1</a></li>
+                        <li class="page-item"><a class="page-link" href="">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                          <a class="page-link" href="#">Next</a>
+                        </li>
+                      </ul>
+                    </nav>
                 </div>
             </div>
         </div>
@@ -592,6 +607,41 @@ function exportarPDF() {
     params.set('export', 'pdf');
     window.open(`${window.location.pathname}?${params.toString()}`, '_blank');
 }
+    function getChamados(pagina, itensPorPagina) {
+        // Atualiza os parâmetros na URL
+        fetch('/chamados/api')
+            .then(response => response.json())
+            .then(data => {
+                preencherTabela(config.table, data, entidade);
+            })
+            .catch(error => {
+                console.error('Erro ao carregar dados:', error);
+                mostrarAlerta('Erro ao carregar dados', 'danger');
+            });
+<!--        const params = new URLSearchParams(window.location.search);-->
+<!--        params.set('pagina', pagina);-->
+<!--        params.set('itensPorPagina', itensPorPagina);-->
+<!--        window.location.href = `${window.location.pathname}?${params.toString()}`;-->
+    }
+    function preencherTabelaChamdados(tabela, chamados) {
+        const tbody = tabela.querySelector('tbody');
+        tbody.innerHTML = '';
+        chamados.forEach(chamado => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${chamado.id}</td>
+                <td>${chamado.status}</td>
+                <td>${chamado.prioridade}</td>
+                <td>${chamado.titulo}</td>
+                <td>${chamado.descricao}</td>
+                <td>${chamado.cliente_nome}</td>
+                <td>${chamado.cliente_email}</td>
+                <td>${chamado.data_solicitacao}</td>
+            `;
+            tbody.appendChild(row);
+        });
+        getChamados();
+    }
 </script>
 {% endblock %}
 

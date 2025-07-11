@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, session, redirect, url_fo
 from flask import jsonify
 from sqlalchemy import func
 
-from src.models import LocalApontamento, Turno, Unidade, NaoConformidade
+from src.models import LocalApontamento, Turno, Unidade, NaoConformidade, Chamado
 from src.models import db
 from src.services.chamado_service import ChamadoService
 
@@ -99,6 +99,10 @@ def detalhes_chamado(protocolo):
         historico=historico
     )
 
+@chamado_bp.route("/api", endpoint="todos_chamados", methods=["GET", ])
+def todos_chamados():
+    chamados = Chamado.query.all()
+    return jsonify([chamado.to_dict() for chamado in chamados])
 
 # 5) ROTA DE CONTATOS
 @chamado_bp.route("/contatos", endpoint="gerenciar_contatos")
@@ -233,13 +237,15 @@ def relatorio():
         #     t[1]: t[0] for t in temporal
         # } if temporal else {}
     }
+    chamados = Chamado.query.order_by(Chamado.id.desc()).all()
     # Renderiza passando o dicionário estatisticas
     return render_template(
         "relatorio.html",
         estatisticas=estatisticas,
         dados=dados,
         filtros=filtros,
-        graficos=graficos
+        graficos=graficos,
+        chamados=chamados
     )
 
 # 7) PAINEL ADMIN
