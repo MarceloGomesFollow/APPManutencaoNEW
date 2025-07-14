@@ -1,6 +1,6 @@
 # src/routes/admin.py
 
-from flask import Blueprint, request, jsonify, render_template, flash, redirect, url_for
+from flask import Blueprint, request, jsonify, render_template, flash, redirect, url_for, session
 from src.models import db  # <— aqui importamos o db correto
 from src.models.turno import Turno
 from src.models.unidade import Unidade
@@ -535,6 +535,8 @@ def criar_contato_notificacao():
 @admin_bp.route('/')
 def painel_admin():
     """Painel principal de administração"""
+    if not session.get('admin_logged_in') and session.get('user_type') != 'admin':
+        return redirect(url_for('admin_auth.admin_login'))
     try:
         estatisticas = {
             'total_turnos': Turno.query.filter_by(ativo=True).count(),

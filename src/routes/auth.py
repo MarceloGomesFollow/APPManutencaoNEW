@@ -2,6 +2,8 @@
 from flask import Blueprint, request, render_template, redirect, url_for, session, flash, current_app
 from functools import wraps
 
+from flask_login import login_user, logout_user
+
 # 1) Blueprint com prefixo /admin
 admin_auth_bp = Blueprint(
     'admin_auth',
@@ -48,6 +50,7 @@ def supervisor_login():
         if password == current_app.config['SUPERVISOR_PASSWORD']:
             session['supervisor_logged_in'] = True
             session['user_type'] = 'supervisor'
+            # login_user({'username': 'supervisor'})
             flash('Login de supervisor realizado com sucesso!', 'success')
             return redirect(url_for('chamado.painel_supervisor'))
         flash('Senha incorreta!', 'error')
@@ -58,6 +61,7 @@ def supervisor_login():
 def admin_logout():
     session.pop('admin_logged_in', None)
     session.pop('user_type', None)
+    # logout_user()
     flash('Logout realizado com sucesso!', 'success')
     return redirect(url_for('chamado.index'))
 

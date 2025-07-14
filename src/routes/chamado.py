@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
 from flask import jsonify
 from sqlalchemy import func
+from sqlalchemy.sql.functions import current_user
 
 from src.models import LocalApontamento, Turno, Unidade, NaoConformidade, Chamado
 from src.models import db
@@ -283,11 +284,14 @@ def painel_admin():
     return render_template("painel_admin.html")
 
 # 8) PAINEL SUPERVISOR
+# @login_required
 @chamado_bp.route("/supervisor", endpoint="painel_supervisor")
 def painel_supervisor():
     from src.models.chamado import Chamado
     from src.models.turno import Turno
     from src.models.unidade import Unidade
+    if not session.get('supervisor_logged_in') and session.get('user_type') != 'supervisor':
+        return redirect(url_for('admin_auth.supervisor_login'))
 
     # Lista todos os chamados
     chamados = Chamado.query.order_by(Chamado.id.desc()).all()
