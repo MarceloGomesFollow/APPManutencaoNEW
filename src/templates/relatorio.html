@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
         prioridade: {{ graficos.prioridade|tojson if graficos and graficos.prioridade else '{}' }},
         turnos: {{ graficos.turnos|tojson if graficos and graficos.turnos else '{}' }},
         unidades: {{ graficos.unidades|tojson if graficos and graficos.unidades else '{}' }},
-        temporal: {{ graficos.temporal|tojson if graficos and graficos.temporal else '{s: 1}' }}
+        temporal: {{ graficos.temporal|tojson if graficos and graficos.temporal else '{}' }}
     };
     
     // Configurações padrão dos gráficos
