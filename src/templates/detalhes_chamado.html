@@ -254,13 +254,13 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    {% if timeline %}
+                    {% if historicos %}
                     <div class="timeline">
-                        {% for evento in timeline %}
+                        {% for evento in historicos %}
                         <div class="timeline-item mb-4">
                             <div class="row">
                                 <div class="col-md-2 text-center">
-                                    <div class="timeline-badge 
+                                    <div class="timeline-badge
                                         {% if evento.tipo_evento == 'created' %}bg-success
                                         {% elif evento.tipo_evento == 'status_change' %}bg-warning
                                         {% elif evento.tipo_evento == 'response' %}bg-info
@@ -299,7 +299,7 @@
                                                 </div>
                                             {% elif evento.tipo_evento == 'notification_sent' %}
                                                 <small class="text-muted">
-                                                    Tipo: {{ evento.detalhes_adicionais.tipo_notificacao }} | 
+                                                    Tipo: {{ evento.detalhes_adicionais.tipo_notificacao }} |
                                                     Para: {{ evento.detalhes_adicionais.destinatario }}
                                                     {% if evento.detalhes_adicionais.sucesso %}
                                                         <span class="text-success">✓ Enviado</span>
@@ -336,7 +336,7 @@
 }
 
 .timeline::before {
-    content: '';
+<!--    content: '';-->
     position: absolute;
     left: 8.33%;
     top: 0;

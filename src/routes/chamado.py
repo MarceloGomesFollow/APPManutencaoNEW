@@ -87,7 +87,7 @@ def detalhes_chamado(protocolo):
     }
 
     # Pega todo o histórico de interação (ordenado do mais recente ao mais antigo)
-    historico = HistoricoChamado.query \
+    historicos = HistoricoChamado.query \
         .filter_by(id_chamado=chamado.id) \
         .order_by(HistoricoChamado.data_hora.desc()) \
         .all()
@@ -96,7 +96,7 @@ def detalhes_chamado(protocolo):
         "detalhes_chamado.html",
         chamado=chamado,
         estatisticas=estatisticas,
-        historico=historico
+        historicos=historicos
     )
 
 @chamado_bp.route("/api", endpoint="todos_chamados", methods=["GET", ])
@@ -148,7 +148,7 @@ def relatorio():
         )
 
     total = query_chamados_total.count()
-    chamados_pendentes = query_chamados_total.filter_by(status='aberto').count()
+    chamados_pendentes = query_chamados_total.filter(Chamado.status != 'concluido').count()
     chamados_concluidos = query_chamados_total.filter_by(status='concluido').count()
     # media_dias = db.session.query(
     #     func.avg(
@@ -214,11 +214,40 @@ def relatorio():
         Unidade.nome
     ).all()
 
-    temporal = db.session.query(
-        *filter_status,
-        func.count(Chamado.id).label('total'),
-        func.date(Chamado.data_solicitacao).label('data')
-    ).group_by(func.date(Chamado.data_solicitacao)).all()
+    temporal = (
+        db.session.query(
+            func.extract('year', Chamado.data_solicitacao).label('ano'),
+            func.extract('month', Chamado.data_solicitacao).label('mes'),
+            Chamado.status,
+            func.count(Chamado.id).label('total')
+        )
+        .group_by(
+            func.extract('year', Chamado.data_solicitacao),
+            func.extract('month', Chamado.data_solicitacao),
+            Chamado.status
+        )
+        .order_by(
+            func.extract('year', Chamado.data_solicitacao),
+            func.extract('month', Chamado.data_solicitacao),
+            Chamado.status
+        )
+        .all()
+    )
+    temporal_ = {
+
+    }
+    for t in temporal:
+        if f'{[1]}/{[0][:2]}' not in temporal_:
+
+            temporal_[f'{[1]}/{[0][:2]}'] = {
+                'abertos': 0,
+                'concluidos': 0
+            }
+        if t[2] == 'aberto':
+            temporal_[f'{[1]}/{[0][:2]}']['abertos'] = t[3]
+        elif t[2] == 'concluido':
+            temporal_[f'{[1]}/{[0][:2]}']['concluidos'] = t[3]
+
 
     graficos = {
         'status': {
@@ -233,9 +262,9 @@ def relatorio():
         'unidades': {
             u[-1]: u[0] for u in unidades
         } if unidades else {},
-        # 'temporal': {
-        #     t[1]: t[0] for t in temporal
-        # } if temporal else {}
+        'temporal': {
+            t[1]: t[0] for t in temporal
+        } if temporal else {}
     }
     chamados = Chamado.query.order_by(Chamado.id.desc()).all()
     # Renderiza passando o dicionário estatisticas
