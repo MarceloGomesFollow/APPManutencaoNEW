@@ -247,22 +247,26 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <select class="form-select form-select-sm status-select" 
-                                                    data-chamado-id="{{ chamado.id }}" 
-                                                    data-status-atual="{{ chamado.status }}">
-                                                <option value="aberto" {% if chamado.status == 'aberto' %}selected{% endif %}>
-                                                    🟢 Aberto
-                                                </option>
-                                                <option value="em_andamento" {% if chamado.status == 'em_andamento' %}selected{% endif %}>
-                                                    🟡 Em Andamento
-                                                </option>
-                                                <option value="aguardando_material" {% if chamado.status == 'aguardando_material' %}selected{% endif %}>
-                                                    🟠 Aguardando Material
-                                                </option>
-                                                <option value="concluido" {% if chamado.status == 'concluido' %}selected{% endif %}>
-                                                    ✅ Concluído
-                                                </option>
-                                            </select>
+                                            {% if chamado.status == 'aberto' %}🟢 Aberto{% endif %}
+                                            {% if chamado.status == 'em_andamento' %}🟡 Em Andamento{% endif %}
+                                            {% if chamado.status == 'aguardando_material' %}🟠 Aguardando Material{% endif %}
+                                            {% if chamado.status == 'concluido' %}✅ Concluído{% endif %}
+<!--                                            <select class="form-select form-select-sm status-select" -->
+<!--                                                    data-chamado-id="{{ chamado.id }}" -->
+<!--                                                    data-status-atual="{{ chamado.status }}" disabled>-->
+<!--                                                <option value="aberto" {% if chamado.status == 'aberto' %}selected{% endif %}>-->
+<!--                                                    🟢 Aberto-->
+<!--                                                </option>-->
+<!--                                                <option value="em_andamento" {% if chamado.status == 'em_andamento' %}selected{% endif %}>-->
+<!--                                                    🟡 Em Andamento-->
+<!--                                                </option>-->
+<!--                                                <option value="aguardando_material" {% if chamado.status == 'aguardando_material' %}selected{% endif %}>-->
+<!--                                                    🟠 Aguardando Material-->
+<!--                                                </option>-->
+<!--                                                <option value="concluido" {% if chamado.status == 'concluido' %}selected{% endif %}>-->
+<!--                                                    ✅ Concluído-->
+<!--                                                </option>-->
+<!--                                            </select>-->
                                         </td>
                                         <td>
                                             <small>{{ chamado.turno.nome if chamado.turno else '-' }}</small>
@@ -426,17 +430,17 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Mudança de status inline
-    document.querySelectorAll('.status-select').forEach(select => {
-        select.addEventListener('change', function() {
-            const chamadoId = this.dataset.chamadoId;
-            const novoStatus = this.value;
-            const statusAtual = this.dataset.statusAtual;
-            
-            if (novoStatus !== statusAtual) {
-                alterarStatus(chamadoId, novoStatus, this);
-            }
-        });
-    });
+<!--    document.querySelectorAll('.status-select').forEach(select => {-->
+<!--        select.addEventListener('change', function() {-->
+<!--            const chamadoId = this.dataset.chamadoId;-->
+<!--            const novoStatus = this.value;-->
+<!--            const statusAtual = this.dataset.statusAtual;-->
+<!--            -->
+<!--            if (novoStatus !== statusAtual) {-->
+<!--                alterarStatus(chamadoId, novoStatus, this);-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
     
     // Formulário de filtros
     document.getElementById('formFiltros').addEventListener('submit', function(e) {
