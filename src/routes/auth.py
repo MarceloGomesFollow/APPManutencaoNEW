@@ -2,7 +2,6 @@
 from flask import Blueprint, request, render_template, redirect, url_for, session, flash, current_app
 from functools import wraps
 
-from flask_login import login_user, logout_user
 
 # 1) Blueprint com prefixo /admin
 admin_auth_bp = Blueprint(
