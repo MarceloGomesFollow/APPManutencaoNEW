@@ -329,7 +329,7 @@
                                 <tr>
                                     <th>Data</th>
                                     <th>Horario</th>
-                                    <th>Por</th>
+<!--                                    <th>Por</th>-->
                                     <th>Anexo</th>
                                     <th>Status</th>
                                     <th>Descricao</th>
@@ -344,10 +344,10 @@
                                         </td>
                                         <td>
                                             <div class="text-truncate" style="max-width: 200px;" title="{{ chamado.titulo }}">
-                                                {{  historico.data_hora.strftime('HH:mm') }}
+                                                {{  historico.data_hora.strftime('%H:%M') }}
                                             </div>
                                         </td>
-                                        <td>{{ historico.usuario }}</td>
+<!--                                        <td>{{ historico.usuario }}</td>-->
                                         <td>
                                             <span class="badge
                                                 {% if chamado.prioridade == 'alta' %}bg-danger
