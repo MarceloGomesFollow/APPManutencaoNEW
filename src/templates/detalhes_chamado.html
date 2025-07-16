@@ -131,18 +131,18 @@
     </div>
 </div>
                     </div>
-                    
+
                     <!-- Resposta do Técnico -->
-                    {% if chamado.resposta_tecnico %}
-                    <div class="mb-3">
-                        <h6 class="text-muted mb-2">
-                            <i class="bi bi-tools"></i> Resposta do Técnico
-                        </h6>
-                        <div class="alert alert-info">
-                            {{ chamado.resposta_tecnico }}
-                        </div>
-                    </div>
-                    {% endif %}
+<!--                    {% if chamado.resposta_tecnico %}-->
+<!--                    <div class="mb-3">-->
+<!--                        <h6 class="text-muted mb-2">-->
+<!--                            <i class="bi bi-tools"></i> Resposta do Técnico-->
+<!--                        </h6>-->
+<!--                        <div class="alert alert-info">-->
+<!--                            {{ chamado.resposta_tecnico }}-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    {% endif %}-->
                     
                     <!-- Ação Tomada -->
                     {% if chamado.acao_tomada %}
@@ -163,12 +163,10 @@
                             <i class="bi bi-paperclip"></i> Anexos
                         </h6>
                         <div class="d-flex flex-wrap gap-2">
-                            {% for anexo in chamado.anexos %}
-                            <a href="{{ url_for('chamado.download_arquivo', filename=anexo) }}" 
+                            <a href="{{ url_for('chamado.download_anexo', filename=chamado.anexos) }}"
                                class="btn btn-outline-primary btn-sm" target="_blank">
                                 <i class="bi bi-download"></i> {{ anexo }}
                             </a>
-                            {% endfor %}
                         </div>
                     </div>
                     {% endif %}
@@ -229,7 +227,7 @@
                 <div class="card-body">
                     <div class="d-grid gap-2">
                        <a href="{{ url_for('chamado.painel_supervisor') }}" class="btn btn-outline-primary btn-sm">
-                       <i class="bi bi-arrow-left"></i> Voltar á Lista
+                        <i class="bi bi-arrow-left"></i> Voltar á Lista
                        </a>
 
 <!--                        <a href="{{ url_for('chamado.abrir_chamado') }}" class="btn btn-outline-success btn-sm">-->
@@ -238,8 +236,64 @@
                         <button class="btn btn-outline-info btn-sm" onclick="window.print()">
                             <i class="bi bi-printer"></i> Imprimir
                         </button>
+                        {% if session['user_type'] == 'supervisor' %}
+                        <a onclick="abrirModalResposta('{{ chamado.id }}')" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-arrow-left"></i> Resposta Técnica
+                       </a>
+                        {% endif %}
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Resposta Técnica -->
+    <div class="modal fade" id="modalResposta" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-chat-dots"></i> Resposta Técnica
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Fechar modal"></button>
+                </div>
+                <form id="formResposta">
+                    <div class="modal-body">
+                        <input type="hidden" id="respostaChamadoId" name="chamado_id">
+    <!--                    {% for chamado in chamados %}-->
+    <!--                    <input type="hidden" name="protocolo" value="{{ chamado.protocolo }}">-->
+    <!--                {% endfor %}-->
+
+                        <div class="mb-3">
+                            <label for="respostaTecnico" class="form-label">Resposta do Técnico *</label>
+                            <textarea class="form-control" id="respostaTecnico" name="resposta_tecnico"
+                                      rows="5" required placeholder="Digite sua resposta técnica detalhada..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="respostaStatus" class="form-label">Alterar Status</label>
+                            <select class="form-select" id="respostaStatus" name="status">
+                                <option value="">Manter status atual</option>
+                                <option value="em_andamento">🟡 Em Andamento</option>
+                                <option value="aguardando_material">🟠 Aguardando Material</option>
+                                <option value="concluido">✅ Concluído</option>
+                            </select>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="notificarCliente" name="notificar_cliente" checked>
+                            <label class="form-check-label" for="notificarCliente">
+                                Notificar cliente por e-mail
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Enviar Resposta
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -254,74 +308,62 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    {% if historicos %}
-                    <div class="timeline">
-                        {% for evento in historicos %}
-                        <div class="timeline-item mb-4">
-                            <div class="row">
-                                <div class="col-md-2 text-center">
-                                    <div class="timeline-badge
-                                        {% if evento.tipo_evento == 'created' %}bg-success
-                                        {% elif evento.tipo_evento == 'status_change' %}bg-warning
-                                        {% elif evento.tipo_evento == 'response' %}bg-info
-                                        {% elif evento.tipo_evento == 'notification_sent' %}bg-secondary
-                                        {% else %}bg-primary{% endif %}">
-                                        {% if evento.tipo_evento == 'created' %}
-                                            <i class="bi bi-plus-circle"></i>
-                                        {% elif evento.tipo_evento == 'status_change' %}
-                                            <i class="bi bi-arrow-repeat"></i>
-                                        {% elif evento.tipo_evento == 'response' %}
-                                            <i class="bi bi-chat-dots"></i>
-                                        {% elif evento.tipo_evento == 'notification_sent' %}
-                                            <i class="bi bi-envelope"></i>
-                                        {% elif evento.tipo_evento == 'comment' %}
-                                            <i class="bi bi-chat-text"></i>
-                                        {% else %}
-                                            <i class="bi bi-circle"></i>
-                                        {% endif %}
-                                    </div>
-                                    <small class="text-muted d-block mt-2">
-                                        {{ evento.data_hora }}
-                                    </small>
-                                </div>
-                                <div class="col-md-10">
-                                    <div class="timeline-content">
-                                        <h6 class="mb-1">{{ evento.descricao }}</h6>
-                                        {% if evento.detalhes_adicionais %}
-                                        <div class="mt-2">
-                                            {% if evento.tipo_evento == 'status_change' %}
-                                                <span class="badge bg-light text-dark">
-                                                    {{ evento.detalhes_adicionais.status_anterior }} → {{ evento.detalhes_adicionais.status_novo }}
-                                                </span>
-                                            {% elif evento.tipo_evento == 'response' %}
-                                                <div class="alert alert-light p-2 mt-2">
-                                                    <small>{{ evento.detalhes_adicionais.resposta }}</small>
-                                                </div>
-                                            {% elif evento.tipo_evento == 'notification_sent' %}
-                                                <small class="text-muted">
-                                                    Tipo: {{ evento.detalhes_adicionais.tipo_notificacao }} |
-                                                    Para: {{ evento.detalhes_adicionais.destinatario }}
-                                                    {% if evento.detalhes_adicionais.sucesso %}
-                                                        <span class="text-success">✓ Enviado</span>
-                                                    {% else %}
-                                                        <span class="text-danger">✗ Falhou</span>
-                                                    {% endif %}
-                                                </small>
-                                            {% endif %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="tabelaChamados">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Horario</th>
+                                    <th>Por</th>
+                                    <th>Anexo</th>
+                                    <th>Status</th>
+                                    <th>Descricao</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if historicos %}
+                                    {% for historico in historicos %}
+                                    <tr>
+                                        <td>
+                                            {{historico.data_hora.strftime('%d/%m/%Y')}}
+                                        </td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 200px;" title="{{ chamado.titulo }}">
+                                                {{  historico.data_hora.strftime('HH:mm') }}
+                                            </div>
+                                        </td>
+                                        <td>{{ historico.usuario }}</td>
+                                        <td>
+                                            <span class="badge
+                                                {% if chamado.prioridade == 'alta' %}bg-danger
+                                                {% elif chamado.prioridade == 'media' %}bg-warning
+                                                {% else %}bg-success{% endif %}">
+                                                Não
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge
+                                                {% if chamado.status == 'concluido' %}bg-success
+                                                {% elif chamado.status == 'em_andamento' %}bg-info
+                                                {% elif chamado.status == 'aguardando_material' %}bg-warning
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ historico.status|replace('_', ' ')|title }}
+                                            </span>
+                                        </td>
+                                        <td>{{ historico.descricao if historico.descricao else '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="10" class="text-center py-4">
+                                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                            <p class="text-muted mt-2">Nenhum chamado encontrado para o período selecionado</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
                     </div>
-                    {% else %}
-                    <div class="text-center py-4">
-                        <i class="bi bi-clock-history text-muted" style="font-size: 3rem;"></i>
-                        <p class="text-muted mt-2">Nenhum evento registrado ainda.</p>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -423,5 +465,51 @@
     }
 }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Função para abrir modal de resposta
+function abrirModalResposta(chamadoId) {
+    document.getElementById('respostaChamadoId').value = chamadoId;
+    document.getElementById('formResposta').reset();
+    document.getElementById('respostaChamadoId').value = chamadoId;
+    new bootstrap.Modal(document.getElementById('modalResposta')).show();
+}
+
+// Função para enviar resposta
+
+async function enviarResposta() {
+    const form = document.getElementById('formResposta');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    // Certifica que o valor booleano seja convertido corretamente
+    data.notificar_cliente = document.getElementById('notificarCliente').checked;
+
+    try {
+        const response = await fetch("/chamados/resposta", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            mostrarAlerta('✅ Resposta enviada com sucesso!', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('modalResposta')).hide();
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            mostrarAlerta(result.mensagem || 'Erro ao enviar resposta', 'danger');
+        }
+    } catch (error) {
+        console.error('Erro na requisição:', error);
+        mostrarAlerta('Erro de conexão ao enviar resposta', 'danger');
+    }
+}
+</script>
 {% endblock %}
 

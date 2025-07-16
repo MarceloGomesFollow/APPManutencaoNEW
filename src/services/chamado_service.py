@@ -40,7 +40,9 @@ class ChamadoService:
             id_status=1,
 
             data_solicitacao=datetime.utcnow(),
-            status="aberto"
+            status="aberto",
+
+            anexos=dados.get('anexos', None),
         )
 
         db.session.add(chamado)

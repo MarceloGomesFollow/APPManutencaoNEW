@@ -36,6 +36,11 @@ class Config:
     SUPERVISOR_PASSWORD = os.getenv('SUPERVISOR_PASSWORD', 'Manu@12345')
     ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'Arfrio@4321')
 
+    R2_ACCESS_KEY_ID = os.getenv('R2_ACCESS_KEY_ID', '123')
+    R2_SECRET_ACCESS_KEY = os.getenv('R2_SECRET_ACCESS_KEY', 'dfsdf13d52f1sdf')
+    R2_ENDPOINT_URL = os.getenv('R2_ENDPOINT_URL', 'https://fdfsdfs.r2.cloudflarestorage.com')
+    R2_BUCKET_NAME = os.getenv('R2_BUCKET_NAME', 'app-manutencao-test')
+
     # -------------------------------
     # 5) Sessão
     # -------------------------------

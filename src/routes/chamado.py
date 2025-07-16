@@ -1,6 +1,7 @@
 from datetime import datetime
+from uuid import uuid4
 
-from flask import Blueprint, render_template, request, session, redirect, url_for, flash
+from flask import Blueprint, render_template, request, session, redirect, url_for, flash, Response, stream_with_context
 from flask import jsonify
 from sqlalchemy import func
 from sqlalchemy.sql.functions import current_user
@@ -8,6 +9,7 @@ from sqlalchemy.sql.functions import current_user
 from src.models import LocalApontamento, Turno, Unidade, NaoConformidade, Chamado
 from src.models import db
 from src.services.chamado_service import ChamadoService
+from src.services.cloudflare_service import upload_file_to_r2, download_file_from_r2
 
 # 1) Importa o modelo para usar no relatório (será carregado dentro das funções após init_app)
 #    Isso garante que o SQLAlchemy já esteja inicializado.
@@ -46,14 +48,18 @@ def abrir_chamado():
     'codigo_equipamento': request.form.get('codigo_equipamento'),
 }
             service = ChamadoService()
-            chamado = service.criar_chamado(dados)  # <-- CORRETO
 
             # Upload de anexos se houver
             if 'anexos' in request.files:
                 for arquivo in request.files.getlist('anexos'):
                     if arquivo.filename:
-                        ...
+                        uuid = str(uuid4())
+                        arquivo.filename = f"{uuid}_{arquivo.filename}"
+                        dados['anexos'] = arquivo.filename
+                        upload_file_to_r2(arquivo, arquivo.filename)
                         # save_uploaded_file(arquivo, chamado.id)
+
+            chamado = service.criar_chamado(dados)  # <-- CORRETO
 
             flash(f'Chamado criado com sucesso! Protocolo: {chamado.protocolo}', 'success')
             return redirect(url_for('chamado.detalhes_chamado', protocolo=chamado.protocolo))
@@ -98,6 +104,15 @@ def detalhes_chamado(protocolo):
         chamado=chamado,
         estatisticas=estatisticas,
         historicos=historicos
+    )
+
+@chamado_bp.route("/download/<string:filename>", endpoint="download_anexo")
+def download_anexo(filename):
+    file_body, content_type = download_file_from_r2(filename)
+    return Response(
+        stream_with_context(file_body),
+        mimetype=content_type,
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
 @chamado_bp.route("/api", endpoint="todos_chamados", methods=["GET", ])
