@@ -6,9 +6,11 @@ src/main.py
 Script de release: aplica migrações e insere dados iniciais.
 Execute via: python -m src.main   (ou `python src/main.py` se preferir)
 """
-
+import locale
 import os
 import sys
+import time
+
 from flask_migrate import upgrade
 from flask import render_template
 from src.models.chamado import Chamado
@@ -16,6 +18,11 @@ from src.models.chamado import Chamado
 
 # ====== PYTHONPATH para execução direta ======
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+
+locale.setlocale(locale.LC_TIME, "pt_BR.utf8")
+os.environ["TZ"] = "America/Sao_Paulo"
+time.tzset()
 
 # ====== Importação da Factory e DB ======
 from src import create_app

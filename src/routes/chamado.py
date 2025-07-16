@@ -314,10 +314,12 @@ def painel_supervisor():
     # Estatísticas
     estatisticas = {
         'total_chamados': Chamado.query.count(),
-        'chamados_abertos': Chamado.query.filter_by(status='aberto').count(),
+        # 'chamados_abertos': Chamado.query.filter_by(status='aberto').count(),
         'chamados_andamento': Chamado.query.filter_by(status='em_andamento').count(),
         'chamados_concluidos': Chamado.query.filter_by(status='concluido').count()
     }
+
+    estatisticas['chamados_abertos'] = estatisticas['total_chamados'] - estatisticas['chamados_andamento'] - estatisticas['chamados_concluidos']
 
     # Filtros
     turnos = Turno.query.all()
@@ -362,7 +364,7 @@ def responder_chamado():
         with db.session.no_autoflush:
             chamado.resposta_tecnico = resposta
             chamado.status = status
-            chamado.data_atualizacao = datetime.utcnow()
+            chamado.data_atualizacao = datetime.now()
             db.session.commit()
         return jsonify({"success": True, "mensagem": "Resposta salva com sucesso!"})
 
@@ -378,7 +380,7 @@ def alterar_status(id):
 
     chamado = Chamado.query.get_or_404(id)
     chamado.status = novo_status
-    chamado.data_atualizacao = datetime.utcnow()
+    chamado.data_atualizacao = datetime.now()
 
     db.session.commit()
     return jsonify({"success": True, "mensagem": "Status atualizado com sucesso!"})
@@ -398,7 +400,7 @@ def registrar_acao(id):
         id_chamado=id,
         tipo_evento='acao',
         descricao=dados.get('descricao'),
-        data_hora=datetime.utcnow()
+        data_hora=datetime.now()
         # Inclua mais campos se necessário
     )
 

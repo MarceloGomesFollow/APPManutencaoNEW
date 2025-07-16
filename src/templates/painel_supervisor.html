@@ -563,7 +563,7 @@ async function enviarResposta() {
 
 // Função para registrar ação
 
-    function registrarAcao() {
+async function registrarAcao() {
     const chamadoId = document.getElementById('acaoChamadoId').value;
 
     const formData = new FormData(document.getElementById('formAcao'));
@@ -572,13 +572,15 @@ async function enviarResposta() {
     // Converte o valor do checkbox
     data.notificar_cliente = document.getElementById('notificarClienteAcao').checked;
 
-    fetch(`/chamados/${chamadoId}/acao`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(result => {
+    try {
+        const response = await fetch(`/chamados/${chamadoId}/acao`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+
+        const result = await response.json();
+
         if (result.success) {
             mostrarAlerta('✅ Ação registrada com sucesso!', 'success');
             bootstrap.Modal.getInstance(document.getElementById('modalAcao')).hide();
@@ -586,11 +588,10 @@ async function enviarResposta() {
         } else {
             mostrarAlerta(result.message || 'Erro ao registrar ação', 'danger');
         }
-    })
-    .catch(error => {
+    } catch(error) {
         console.error('Erro:', error);
         mostrarAlerta('Erro ao registrar ação', 'danger');
-    });
+    }
 }
 
 

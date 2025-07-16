@@ -39,7 +39,7 @@ class ChamadoService:
             id_local_apontamento=int(dados.get('id_local_apontamento')) if dados.get('id_local_apontamento') else None,
             id_status=1,
 
-            data_solicitacao=datetime.utcnow(),
+            data_solicitacao=datetime.now(),
             status="aberto",
 
             anexos=dados.get('anexos', None),
