@@ -6,7 +6,6 @@ src/main.py
 Script de release: aplica migrações e insere dados iniciais.
 Execute via: python -m src.main   (ou `python src/main.py` se preferir)
 """
-import locale
 import os
 import sys
 import time
@@ -20,7 +19,6 @@ from src.models.chamado import Chamado
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-locale.setlocale(locale.LC_TIME, "pt_BR.utf8")
 os.environ["TZ"] = "America/Sao_Paulo"
 time.tzset()
 
