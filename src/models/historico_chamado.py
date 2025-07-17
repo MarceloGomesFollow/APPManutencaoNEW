@@ -20,6 +20,9 @@ class HistoricoChamado(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_chamado = db.Column(db.Integer, db.ForeignKey('tb_chamados.id'), nullable=False)
     id_usuario = db.Column(db.Integer, db.ForeignKey('tb_users.id'), nullable=True)
+
+    anexos = db.Column(db.Text)
+    status = db.Column(db.String(20), nullable=True, default='aberto')
     
     # -------------------------------
     # 3) Detalhes do evento
