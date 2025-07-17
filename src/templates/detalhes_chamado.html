@@ -350,17 +350,16 @@
 <!--                                        <td>{{ historico.usuario }}</td>-->
                                         <td>
                                             <span class="badge
-                                                {% if chamado.prioridade == 'alta' %}bg-danger
-                                                {% elif chamado.prioridade == 'media' %}bg-warning
+                                                {% if historico.anexos%}bg-success
                                                 {% else %}bg-success{% endif %}">
-                                                Não
+                                                {% if historico.anexos %}Sim{% else %}Não{% endif %}
                                             </span>
                                         </td>
                                         <td>
                                             <span class="badge
-                                                {% if chamado.status == 'concluido' %}bg-success
-                                                {% elif chamado.status == 'em_andamento' %}bg-info
-                                                {% elif chamado.status == 'aguardando_material' %}bg-warning
+                                                {% if historico.status == 'aberto' %}bg-success
+                                                {% elif historico.status == 'em_andamento' %}bg-info
+                                                {% elif historico.status == 'aguardando_material' %}bg-warning
                                                 {% else %}bg-secondary{% endif %}">
                                                 {{ historico.status|replace('_', ' ')|title }}
                                             </span>

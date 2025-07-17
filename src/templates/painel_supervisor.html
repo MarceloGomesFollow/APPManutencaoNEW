@@ -347,6 +347,18 @@
                             <option value="concluido">✅ Concluído</option>
                         </select>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="anexosRespostaTecnica" class="form-label">
+                            <i class="bi bi-cloud-upload"></i> Fotos, Documentos ou Vídeos
+                        </label>
+                        <input type="file" class="form-control" id="anexosRespostaTecnica" name="anexos" multiple
+                               accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.mp4,.avi,.mov">
+                        <div class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Tipos permitidos: JPG, PNG, GIF, PDF, DOC, DOCX, TXT, MP4, AVI, MOV (máximo 16MB por arquivo)
+                        </div>
+                    </div>
                     
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="notificarCliente" name="notificar_cliente" checked>
@@ -405,6 +417,18 @@
                             <option value="aguardando_material">🟠 Aguardando Material</option>
                             <option value="concluido">✅ Concluído</option>
                         </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="anexosAcao" class="form-label">
+                            <i class="bi bi-cloud-upload"></i> Fotos, Documentos ou Vídeos
+                        </label>
+                        <input type="file" class="form-control" id="anexosAcao" name="anexos" multiple
+                               accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.mp4,.avi,.mov">
+                        <div class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Tipos permitidos: JPG, PNG, GIF, PDF, DOC, DOCX, TXT, MP4, AVI, MOV (máximo 16MB por arquivo)
+                        </div>
                     </div>
                     
                     <div class="form-check">
@@ -530,18 +554,20 @@ function abrirModalAcao(chamadoId) {
 async function enviarResposta() {
     const form = document.getElementById('formResposta');
     const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
 
     // Certifica que o valor booleano seja convertido corretamente
-    data.notificar_cliente = document.getElementById('notificarCliente').checked;
+    formData.set('notificar_cliente', document.getElementById('notificarCliente').checked);
+
+    // Adiciona o arquivo (supondo um input type="file" com id="anexosRespostaTecnica")
+    const arquivoInput = document.getElementById('anexosRespostaTecnica');
+    if (arquivoInput && arquivoInput.files.length > 0) {
+        formData.append('arquivo', arquivoInput.files[0]);
+    }
 
     try {
         const response = await fetch("/chamados/resposta", {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+            body: formData
         });
 
         const result = await response.json();
@@ -565,19 +591,23 @@ async function enviarResposta() {
 
 async function registrarAcao() {
     const chamadoId = document.getElementById('acaoChamadoId').value;
-
-    const formData = new FormData(document.getElementById('formAcao'));
-    const data = Object.fromEntries(formData.entries());
+    const form = document.getElementById('formAcao');
+    const formData = new FormData(form);
 
     // Converte o valor do checkbox
-    data.notificar_cliente = document.getElementById('notificarClienteAcao').checked;
+    formData.set('notificar_cliente', document.getElementById('notificarClienteAcao').checked);
+
+    // Adiciona o arquivo (supondo um input type="file" com id="anexosAcao")
+    const arquivoInput = document.getElementById('anexosAcao');
+    if (arquivoInput && arquivoInput.files.length > 0) {
+        formData.append('arquivo', arquivoInput.files[0]);
+    }
 
     try {
         const response = await fetch(`/chamados/${chamadoId}/acao`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
+            body: formData // Não use headers aqui!
+        });
 
         const result = await response.json();
 

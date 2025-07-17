@@ -6,7 +6,7 @@ from flask import jsonify
 from sqlalchemy import func
 from sqlalchemy.sql.functions import current_user
 
-from src.models import LocalApontamento, Turno, Unidade, NaoConformidade, Chamado
+from src.models import LocalApontamento, Turno, Unidade, NaoConformidade, Chamado, HistoricoChamado
 from src.models import db
 from src.services.chamado_service import ChamadoService
 from src.services.cloudflare_service import upload_file_to_r2, download_file_from_r2
@@ -353,7 +353,9 @@ def supervisor_logout():
 @chamado_bp.route('/resposta', methods=['POST'])
 def responder_chamado():
     from src.models.chamado import Chamado
-    data = request.get_json()
+
+    data = request.form
+
     chamado_id = data.get("chamado_id")
     resposta = data.get("resposta_tecnico")
     status = data.get("status")
@@ -366,6 +368,30 @@ def responder_chamado():
             chamado.status = status
             chamado.data_atualizacao = datetime.now()
             db.session.commit()
+
+
+        anexos_names = None
+
+        if 'anexos' in request.files:
+            for arquivo in request.files.getlist('anexos'):
+                if arquivo.filename:
+                    uuid = str(uuid4())
+                    arquivo.filename = f"{uuid}_{arquivo.filename}"
+                    anexos_names = arquivo.filename
+                    upload_file_to_r2(arquivo, arquivo.filename)
+
+        nova_acao = HistoricoChamado(
+            id_chamado=chamado.id,
+            tipo_evento='resposta_tecnico',
+            descricao=data.get("resposta_tecnico"),
+            data_hora=datetime.now(),
+            status=data.get('status', None),
+            anexos=anexos_names,
+            # Inclua mais campos se necessário
+        )
+        db.session.add(nova_acao)
+        db.session.commit()
+
         return jsonify({"success": True, "mensagem": "Resposta salva com sucesso!"})
 
     return jsonify({"success": False, "mensagem": "Chamado não encontrado."}), 404
@@ -390,17 +416,28 @@ def alterar_status(id):
 
 @chamado_bp.route('/<int:id>/acao', methods=['POST'])
 def registrar_acao(id):
-    from src.models.historico_chamado import HistoricoChamado
     from src import db
     from flask import request, jsonify
 
-    dados = request.get_json()
+    dados = request.form
+
+    anexos_names = None
+
+    if 'anexos' in request.files:
+        for arquivo in request.files.getlist('anexos'):
+            if arquivo.filename:
+                uuid = str(uuid4())
+                arquivo.filename = f"{uuid}_{arquivo.filename}"
+                anexos_names = arquivo.filename
+                upload_file_to_r2(arquivo, arquivo.filename)
 
     nova_acao = HistoricoChamado(
         id_chamado=id,
         tipo_evento='acao',
         descricao=dados.get('descricao'),
-        data_hora=datetime.now()
+        data_hora=datetime.now(),
+        status=dados.get('acaoStatus', None),
+        anexos=anexos_names,
         # Inclua mais campos se necessário
     )
 
