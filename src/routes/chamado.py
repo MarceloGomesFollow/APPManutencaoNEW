@@ -10,6 +10,7 @@ from src.models import LocalApontamento, Turno, Unidade, NaoConformidade, Chamad
 from src.models import db
 from src.services.chamado_service import ChamadoService
 from src.services.cloudflare_service import upload_file_to_r2, download_file_from_r2
+from src.utils.meses import MESES
 
 # 1) Importa o modelo para usar no relatório (será carregado dentro das funções após init_app)
 #    Isso garante que o SQLAlchemy já esteja inicializado.
@@ -253,17 +254,33 @@ def relatorio():
 
     }
     for t in temporal:
-        if f'{[1]}/{[0][:2]}' not in temporal_:
+        if f'{MESES[t[1]]}/{str(t[0])[-2:]}' not in temporal_:
 
-            temporal_[f'{[1]}/{[0][:2]}'] = {
-                'abertos': 0,
-                'concluidos': 0
+            temporal_[f'{MESES[t[1]]}/{str(t[0])[-2:]}'] = {
+                '1': 0,
+                '2': 0,
+                '3': 0,
+                '4': 0,
             }
         if t[2] == 'aberto':
-            temporal_[f'{[1]}/{[0][:2]}']['abertos'] = t[3]
+            temporal_[f'{MESES[t[1]]}/{str(t[0])[-2:]}']['1'] = t[3]
+        elif t[2] == 'em_andamento':
+            temporal_[f'{MESES[t[1]]}/{str(t[0])[-2:]}']['2'] = t[3]
+        elif t[2] == 'aguardando_material':
+            temporal_[f'{MESES[t[1]]}/{str(t[0])[-2:]}']['3'] = t[3]
         elif t[2] == 'concluido':
-            temporal_[f'{[1]}/{[0][:2]}']['concluidos'] = t[3]
+            temporal_[f'{MESES[t[1]]}/{str(t[0])[-2:]}']['4'] = t[3]
 
+    meses = list(temporal_.keys())
+    status_ = {}
+    # Descobre todos os status existentes
+    for value in temporal_.values():
+        for k in value.keys():
+            status_.setdefault(k, [])
+    # Preenche os valores para cada status, na ordem dos meses
+    for s in status_:
+        status_[s] = [temporal_[mes].get(s, 0) for mes in meses]
+    t = {'meses': meses, 'status': status_}
 
     graficos = {
         'status': {
@@ -278,9 +295,7 @@ def relatorio():
         'unidades': {
             u[-1]: u[0] for u in unidades
         } if unidades else {},
-        # 'temporal': {
-        #     t[1]: t[0] for t in temporal
-        # } if temporal else {}
+        'temporal': t
     }
     chamados = Chamado.query.order_by(Chamado.id.desc()).all()
     # Renderiza passando o dicionário estatisticas
