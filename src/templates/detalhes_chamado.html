@@ -262,56 +262,68 @@
         </div>
     </div>
 
-    <!-- Modal para Resposta Técnica -->
-    <div class="modal fade" id="modalResposta" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-chat-dots"></i> Resposta Técnica
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Fechar modal"></button>
-                </div>
-                <form id="formResposta">
-                    <div class="modal-body">
-                        <input type="hidden" id="respostaChamadoId" name="chamado_id">
-    <!--                    {% for chamado in chamados %}-->
-    <!--                    <input type="hidden" name="protocolo" value="{{ chamado.protocolo }}">-->
-    <!--                {% endfor %}-->
-
-                        <div class="mb-3">
-                            <label for="respostaTecnico" class="form-label">Resposta do Técnico *</label>
-                            <textarea class="form-control" id="respostaTecnico" name="resposta_tecnico"
-                                      rows="5" required placeholder="Digite sua resposta técnica detalhada..."></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="respostaStatus" class="form-label">Alterar Status</label>
-                            <select class="form-select" id="respostaStatus" name="status">
-                                <option value="">Manter status atual</option>
-                                <option value="em_andamento">🟡 Em Andamento</option>
-                                <option value="aguardando_material">🟠 Aguardando Material</option>
-                                <option value="concluido">✅ Concluído</option>
-                            </select>
-                        </div>
-
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="notificarCliente" name="notificar_cliente" checked>
-                            <label class="form-check-label" for="notificarCliente">
-                                Notificar cliente por e-mail
-                            </label>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-send"></i> Enviar Resposta
-                        </button>
-                    </div>
-                </form>
+   <!-- Modal para Resposta Técnica -->
+<div class="modal fade" id="modalResposta" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-chat-dots"></i> Resposta Técnica
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" title="Fechar modal"></button>
             </div>
+            <form id="formResposta">
+                <div class="modal-body">
+                    <input type="hidden" id="respostaChamadoId" name="chamado_id">
+<!--                    {% for chamado in chamados %}-->
+<!--                    <input type="hidden" name="protocolo" value="{{ chamado.protocolo }}">-->
+<!--                {% endfor %}-->
+
+                    <div class="mb-3">
+                        <label for="respostaTecnico" class="form-label">Resposta do Técnico *</label>
+                        <textarea class="form-control" id="respostaTecnico" name="resposta_tecnico"
+                                  rows="5" required placeholder="Digite sua resposta técnica detalhada..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="respostaStatus" class="form-label">Alterar Status</label>
+                        <select class="form-select" id="respostaStatus" name="status">
+                            <option value="">Manter status atual</option>
+                            <option value="em_andamento">🟡 Em Andamento</option>
+                            <option value="aguardando_material">🟠 Aguardando Material</option>
+                            <option value="concluido">✅ Concluído</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="anexosRespostaTecnica" class="form-label">
+                            <i class="bi bi-cloud-upload"></i> Fotos, Documentos ou Vídeos
+                        </label>
+                        <input type="file" class="form-control" id="anexosRespostaTecnica" name="anexos" multiple
+                               accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.mp4,.avi,.mov">
+                        <div class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Tipos permitidos: JPG, PNG, GIF, PDF, DOC, DOCX, TXT, MP4, AVI, MOV (máximo 16MB por arquivo)
+                        </div>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="notificarCliente" name="notificar_cliente" checked>
+                        <label class="form-check-label" for="notificarCliente">
+                            Notificar cliente por e-mail
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Enviar Resposta
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
     
     <!-- Timeline -->
     <div class="row">
@@ -362,7 +374,7 @@
                                                 </span>
                                                 {% if historico.anexos %}
                                                     <div class="d-flex flex-wrap gap-2">
-                                                        <a href="{{ url_for('chamado.download_anexo', filename=chamado.anexos) }}"
+                                                        <a href="{{ url_for('chamado.download_anexo', filename=historico.anexos) }}"
                                                            class="btn btn-outline-primary btn-sm" target="_blank">
                                                             <i class="bi bi-download"></i> {{ anexo }}
                                                         </a>
@@ -498,47 +510,76 @@
 
 {% block extra_js %}
 <script>
-// Função para abrir modal de resposta
-function abrirModalResposta(chamadoId) {
-    document.getElementById('respostaChamadoId').value = chamadoId;
-    document.getElementById('formResposta').reset();
-    document.getElementById('respostaChamadoId').value = chamadoId;
-    new bootstrap.Modal(document.getElementById('modalResposta')).show();
-}
-
-// Função para enviar resposta
-
-async function enviarResposta() {
-    const form = document.getElementById('formResposta');
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-
-    // Certifica que o valor booleano seja convertido corretamente
-    data.notificar_cliente = document.getElementById('notificarCliente').checked;
-
-    try {
-        const response = await fetch("/chamados/resposta", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+    document.addEventListener('DOMContentLoaded', function() {
+        // Formulário de resposta
+        document.getElementById('formResposta').addEventListener('submit', function(e) {
+            e.preventDefault();
+            enviarResposta();
         });
-
-        const result = await response.json();
-
-        if (result.success) {
-            mostrarAlerta('✅ Resposta enviada com sucesso!', 'success');
-            bootstrap.Modal.getInstance(document.getElementById('modalResposta')).hide();
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            mostrarAlerta(result.mensagem || 'Erro ao enviar resposta', 'danger');
-        }
-    } catch (error) {
-        console.error('Erro na requisição:', error);
-        mostrarAlerta('Erro de conexão ao enviar resposta', 'danger');
+    })
+    // Função para abrir modal de resposta
+    function abrirModalResposta(chamadoId) {
+        document.getElementById('respostaChamadoId').value = chamadoId;
+        document.getElementById('formResposta').reset();
+        document.getElementById('respostaChamadoId').value = chamadoId;
+        new bootstrap.Modal(document.getElementById('modalResposta')).show();
     }
-}
+
+    // Função para enviar resposta
+
+    async function enviarResposta() {
+        const form = document.getElementById('formResposta');
+        const formData = new FormData(form);
+
+        // Certifica que o valor booleano seja convertido corretamente
+        formData.set('notificar_cliente', document.getElementById('notificarCliente').checked);
+
+        // Adiciona o arquivo (supondo um input type="file" com id="anexosRespostaTecnica")
+        const arquivoInput = document.getElementById('anexosRespostaTecnica');
+        if (arquivoInput && arquivoInput.files.length > 0) {
+            formData.append('arquivo', arquivoInput.files[0]);
+        }
+
+        try {
+            const response = await fetch("/chamados/resposta", {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                mostrarAlerta('✅ Resposta enviada com sucesso!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('modalResposta')).hide();
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                mostrarAlerta(result.mensagem || 'Erro ao enviar resposta', 'danger');
+            }
+        } catch (error) {
+            console.error('Erro na requisição:', error);
+            mostrarAlerta('Erro de conexão ao enviar resposta', 'danger');
+        }
+    }
+
+    // Função para mostrar alertas
+    function mostrarAlerta(mensagem, tipo) {
+        const alertContainer = document.createElement('div');
+        alertContainer.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
+        alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alertContainer.innerHTML = `
+            ${mensagem}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" title="Fechar alerta"></button>
+        `;
+
+        document.body.appendChild(alertContainer);
+
+        // Remove automaticamente após 5 segundos
+        setTimeout(() => {
+            if (alertContainer.parentNode) {
+                alertContainer.remove();
+            }
+        }, 5000);
+    }
 </script>
 {% endblock %}
 

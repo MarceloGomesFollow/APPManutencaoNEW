@@ -33,21 +33,21 @@ def abrir_chamado():
     if request.method == "POST":
         try:
             dados = {
-    'cliente_nome': request.form.get('cliente_nome'),
-    'cliente_email': request.form.get('cliente_email'),
-    'cliente_telefone': request.form.get('cliente_telefone'),
-    'email_requisitante': request.form.get('email_requisitante'),
-    'telefone_requisitante': request.form.get('telefone_requisitante'),
-    'titulo': request.form.get('titulo'),
-    'descricao': request.form.get('descricao'),
-    'prioridade': request.form.get('prioridade'),
-    'id_turno': request.form.get('id_turno'),
-    'id_unidade': request.form.get('id_unidade'),
-    'id_local_apontamento': request.form.get('id_local_apontamento'),
-    'id_nao_conformidade': request.form.get('id_nao_conformidade'),
-    'equipamento_envolvido': request.form.get('equipamento_envolvido'),
-    'codigo_equipamento': request.form.get('codigo_equipamento'),
-}
+                'cliente_nome': request.form.get('cliente_nome'),
+                'cliente_email': request.form.get('cliente_email'),
+                'cliente_telefone': request.form.get('cliente_telefone'),
+                'email_requisitante': request.form.get('email_requisitante'),
+                'telefone_requisitante': request.form.get('telefone_requisitante'),
+                'titulo': request.form.get('titulo'),
+                'descricao': request.form.get('descricao'),
+                'prioridade': request.form.get('prioridade'),
+                'id_turno': request.form.get('id_turno'),
+                'id_unidade': request.form.get('id_unidade'),
+                'id_local_apontamento': request.form.get('id_local_apontamento'),
+                'id_nao_conformidade': request.form.get('id_nao_conformidade'),
+                'equipamento_envolvido': request.form.get('equipamento_envolvido'),
+                'codigo_equipamento': request.form.get('codigo_equipamento'),
+            }
             service = ChamadoService()
 
             # Upload de anexos se houver
@@ -75,8 +75,9 @@ def abrir_chamado():
         "nao_conformidades": NaoConformidade.query.filter_by(ativo=True).all()
     }
     return render_template("abrir_chamado.html", dados=dados)
-# 4) ROTA DE DETALHES, passando o protocolo para o template
 
+
+# 4) ROTA DE DETALHES, passando o protocolo para o template
 @chamado_bp.route("/detalhes/<string:protocolo>", endpoint="detalhes_chamado")
 def detalhes_chamado(protocolo):
     from src.models.chamado import Chamado
