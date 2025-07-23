@@ -124,6 +124,14 @@ def localtime_filter(value):
     tz = timezone(app.config['TIMEZONE'])
     return value.astimezone(tz) if value else value
 
+@app.template_filter('strftime')
+def _jinja2_filter_datetime(date, fmt=None):
+    if date is None:
+        return ''
+    if fmt is None:
+        fmt = '%d/%m/%Y %H:%M'
+    return date.strftime(fmt)
+
 @app.route('/relatorio')
 def relatorio():
     # Obtenção das estatísticas de chamados
