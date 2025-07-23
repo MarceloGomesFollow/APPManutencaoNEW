@@ -41,12 +41,19 @@ class Config:
     R2_ENDPOINT_URL = os.getenv('R2_ENDPOINT_URL', 'https://fdfsdfs.r2.cloudflarestorage.com')
     R2_BUCKET_NAME = os.getenv('R2_BUCKET_NAME', 'app-manutencao-test')
 
+
+
     # -------------------------------
     # 5) Sessão
     # -------------------------------
     PERMANENT_SESSION_LIFETIME = timedelta(
         seconds=int(os.getenv('SESSION_LIFETIME', '3600'))
     )
+
+    # -------------------------------
+    # 6) Time Zone
+    # -------------------------------
+    TIMEZONE = os.getenv('TIMEZONE', 'America/Sao_Paulo')
 
     @staticmethod
     def init_app(app):
