@@ -275,8 +275,8 @@
                                         </td>
                                         <td>{{ chamado.turno.nome if chamado.turno else '-' }}</td>
                                         <td>{{ chamado.unidade.nome if chamado.unidade else '-' }}</td>
-                                        <td>{{ chamado.data_solicitacao.strftime('%d/%m/%Y %H:%M') if chamado.data_solicitacao else '-' }}</td>
-                                        <td>{{ chamado.data_fechamento.strftime('%d/%m/%Y %H:%M') if chamado.data_fechamento else '-' }}</td>
+                                        <td>{{ chamado.data_solicitacao|localtime|strftime('%d/%m/%Y %H:%M') if chamado.data_solicitacao else '-' }}</td>
+                                        <td>{{ chamado.data_fechamento|localtime|strftime('%d/%m/%Y %H:%M') if chamado.data_fechamento else '-' }}</td>
 <!--                                        <td>-->
 <!--                                            {% if chamado.tempo_resolucao %}-->
 <!--                                                {{ "%.1f"|format(chamado.tempo_resolucao) }} dias-->

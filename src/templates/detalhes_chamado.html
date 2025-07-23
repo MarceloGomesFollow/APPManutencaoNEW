@@ -118,14 +118,14 @@
         {% if chamado.data_inicio_atendimento %}
         <div class="col-md-4">
             <small class="text-muted">Início Atendimento:</small><br>
-            <strong>{{ chamado.data_inicio_atendimento.strftime('%d/%m/%Y %H:%M') }}</strong>
+            <strong>{{ chamado.data_inicio_atendimento|localtime|strftime('%d/%m/%Y %H:%M') }}</strong>
         </div>
         {% endif %}
 
         {% if chamado.data_fechamento %}
         <div class="col-md-4">
             <small class="text-muted">Conclusão:</small><br>
-            <strong>{{ chamado.data_fechamento.strftime('%d/%m/%Y %H:%M') }}</strong>
+            <strong>{{ chamado.data_fechamento|localtime|strftime('%d/%m/%Y %H:%M') }}</strong>
         </div>
         {% endif %}
     </div>
@@ -352,11 +352,11 @@
                                     {% for historico in historicos %}
                                     <tr>
                                         <td>
-                                            {{historico.data_hora.strftime('%d/%m/%Y')}}
+                                            {{historico.data_hora|localtime|strftime('%d/%m/%Y')}}
                                         </td>
                                         <td>
                                             <div class="text-truncate" style="max-width: 200px;" title="{{ chamado.titulo }}">
-                                                {{  historico.data_hora.strftime('%H:%M') }}
+                                                {{  historico.data_hora|localtime|strftime('%H:%M') }}
                                             </div>
                                         </td>
 <!--                                        <td>{{ historico.usuario }}</td>-->

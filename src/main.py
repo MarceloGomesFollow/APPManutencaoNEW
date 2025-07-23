@@ -9,6 +9,7 @@ Execute via: python -m src.main   (ou `python src/main.py` se preferir)
 import os
 import sys
 import time
+from pytz import timezone
 
 from flask_migrate import upgrade
 from flask import render_template
@@ -118,6 +119,10 @@ if __name__ == "__main__":
 from src import create_app
 app = create_app()
 
+@app.template_filter('localtime')
+def localtime_filter(value):
+    tz = timezone(app.config['TIMEZONE'])
+    return value.astimezone(tz) if value else value
 
 @app.route('/relatorio')
 def relatorio():
