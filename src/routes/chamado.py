@@ -130,6 +130,8 @@ def gerenciar_contatos():
 # 6) ROTA DE RELATÓRIO: calcula estatísticas e passa para o template
 @chamado_bp.route("/relatorio", endpoint="relatorio")
 def relatorio():
+    if not session.get('supervisor_logged_in') and session.get('user_type') != 'supervisor':
+        return redirect(url_for('chamado.index'))
     # 1) Import dinâmico do modelo Chamado
     from src.models.chamado import Chamado
 
